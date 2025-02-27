@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Drywall Estimator with Blueprint Designer</title>
+    <style>
+        :root {
+            --primary: #3182ce;
+            --primary-dark: #2c5282;
+            --secondary: #e2e8f0;
+            --danger: #e53e3e;
+            --danger-dark: #c53030;
+            --success: #38a169;
+            --text: #2d3748;
+            --text-light: #718096;
+            --bg: #f7fafc;
+            --card-bg: white;
+            --border: #e2e8f0;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        h1, h2, h3, h4 {
+            color: var(--primary-dark);
+            margin-bottom: 16px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .header-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        
+        @media (min-width: 992px) {
+            .dashboard {
+                grid-template-columns: 3fr 2fr;
+            }
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--secondary);
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .room {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        
+        .room:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .room-name {
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            color: var(--primary);
+            padding: 4px 8px;
+            font-size: 1rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .room-name:focus {
+            outline: none;
+            background: rgba(49, 130, 206, 0.1);
+        }
+        
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .room-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+            color: var(--text-light);
+        }
+        
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(49, 130, 206, 0.1);
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--danger-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-icon {
+            margin-right: 6px;
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: var(--border);
+            margin: 16px 0;
+        }
+        
+        .result-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            margin-bottom: 8px;
+        }
+        
+        .result-label {
+            font-weight: 600;
+        }
+        
+        .final-cost {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .notes {
+            font-size: 0.9rem;
+            margin-top: 16px;
+        }
+        
+        .notes li {
+            margin-bottom: 6px;
+        }
+        
+        /* Blueprint canvas styles */
+        #blueprint-container {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: #f1f5f9;
+            width: 100%;
+            height: 600px;
+        }
+        
+        canvas {
+            position: absolute;
+            cursor: crosshair;
+        }
+        
+        .blueprint-tools {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        .measurement {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: var(--text);
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-size: 10px;
+            pointer-events: none;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+        
+        .summary-table th,
+        .summary-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .summary-table th {
+            background-color: var(--bg);
+            font-weight: 600;
+        }
+        
+        .summary-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        @media (min-width: 768px) {
+            .material-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .print-btn {
+            margin-top: 16px;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        /* Color indicators for the blueprint */
+        .color-indicators {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .color-indicator {
+            display: flex;
+            align-items: center;
+        }
+        
+        .color-box {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            border-radius: 3px;
+        }
+        
+        .wall-color { background-color: #2d3748; }
+        .door-color { background-color: #9c4221; }
+        .window-color { background-color: #2b6cb0; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        
+        .close-modal:hover {
+            color: var(--text);
+        }
+        
+        /* Added support for step-based guide */
+        .steps-container {
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .step-text {
+            flex-grow: 1;
+        }
+        
+        .completed .step-number {
+            background-color: var(--success);
+        }
+        
+        .blueprint-info {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            padding: 12px;
+            background-color: #f1f5f9;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Enhanced Drywall Estimator</h1>
+            <p class="header-subtitle">Design your floor plan and get accurate material estimates</p>
+        </header>
+        
+        <div class="dashboard">
+            <!-- Blueprint Designer Section -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 style="margin-bottom: 0;">Blueprint Designer</h2>
+                        <div>
+                            <button id="reset-canvas-btn" class="btn btn-sm btn-outline">
+                                <span class="btn-icon">↺</span> Reset
+                            </button>
+                            <button id="save-blueprint-btn" class="btn btn-sm">
+                                <span class="btn-icon">💾</span> Save
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="steps-container">
+                        <div class="step completed">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Choose a drawing tool from the options below</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Draw your floor plan by clicking and dragging</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Add doors and windows to complete your design</div>
+                        </div>
+                    </div>
+                    
+                    <div class="blueprint-tools">
+                        <button class="btn btn-sm draw-tool" data-tool="wall">
+                            <span class="btn-icon">┃</span> Wall
+                        </button>
+                        <button class="btn btn-sm btn-outline draw-tool" data-tool="door">
+                            <span class="btn-icon">🚪</span> Door
+                        </button>
+                        <button class="btn btn-sm btn-outline draw-tool" data-tool="window">
+                            <span class="btn-icon">▯</span> Window
+                        </button>
+                        <button class="btn btn-sm btn-outline draw-tool" data-tool="room">
+                            <span class="btn-icon">□</span> Auto Room
+                        </button>
+                        <button class="btn btn-sm btn-outline draw-tool" data-tool="erase">
+                            <span class="btn-icon">⌫</span> Erase
+                        </button>
+                        <button class="btn btn-sm btn-outline" id="zoom-in-btn">
+                            <span class="btn-icon">+</span> Zoom In
+                        </button>
+                        <button class="btn btn-sm btn-outline" id="zoom-out-btn">
+                            <span class="btn-icon">-</span> Zoom Out
+                        </button>
+                    </div>
+                    
+                    <div class="color-indicators">
+                        <div class="color-indicator">
+                            <div class="color-box wall-color"></div>
+                            <span>Wall</span>
+                        </div>
+                        <div class="color-indicator">
+                            <div class="color-box door-color"></div>
+                            <span>Door</span>
+                        </div>
+                        <div class="color-indicator">
+                            <div class="color-box window-color"></div>
+                            <span>Window</span>
+                        </div>
+                    </div>
+                    
+                    <div id="blueprint-container">
+                        <canvas id="blueprint-canvas"></canvas>
+                        <canvas id="grid-canvas"></canvas>
+                    </div>
+                    
+                    <div class="blueprint-info">
+                        <strong>Scale:</strong> Each grid cell = 1 foot
+                        <br>
+                        <strong>Tip:</strong> Double-click a wall to create a door or window
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2 style="margin-bottom: 0;">Room Configuration</h2>
+                        <button id="add-room-btn" class="btn btn-sm">
+                            <span class="btn-icon">+</span> Add Room
+                        </button>
+                    </div>
+                    
+                    <div class="tabs">
+                        <div class="tab active" data-tab="manual-rooms">Manual Entry</div>
+                        <div class="tab" data-tab="blueprint-rooms">From Blueprint</div>
+                    </div>
+                    
+                    <div id="manual-rooms" class="tab-content active">
+                        <div id="rooms-container">
+                            <!-- Rooms will be added here -->
+                        </div>
+                    </div>
+                    
+                    <div id="blueprint-rooms" class="tab-content">
+                        <div id="detected-rooms-container">
+                            <p>Rooms detected from your blueprint will appear here.</p>
+                            <!-- Detected rooms will be added here -->
+                        </div>
+                        <button id="analyze-blueprint-btn" class="btn">
+                            <span class="btn-icon">🔍</span> Analyze Blueprint
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings and Results Section -->
+            <div>
+                <!-- Materials & Pricing Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 style="margin-bottom: 0;">Materials & Labor Pricing</h2>
+                        <button id="preset-pricing-btn" class="btn btn-sm btn-outline">
+                            <span class="btn-icon">⚙️</span> Load Presets
+                        </button>
+                    </div>
+                    
+                    <div class="material-grid">
+                        <div class="form-group">
+                            <label>Drywall Sheet ($/sheet)</label>
+                            <input type="number" min="0" step="0.01" id="drywall-cost" value="15">
+                        </div>
+                        <div class="form-group">
+                            <label>Joint Compound ($/bucket)</label>
+                            <input type="number" min="0" step="0.01" id="mud-cost" value="20">
+                        </div>
+                        <div class="form-group">
+                            <label>Tape ($/roll)</label>
+                            <input type="number" min="0" step="0.01" id="tape-cost" value="8">
+                        </div>
+                        <div class="form-group">
+                            <label>Screws ($/lb)</label>
+                            <input type="number" min="0" step="0.01" id="screws-cost" value="8">
+                        </div>
+                        <div class="form-group">
+                            <label>Corner Bead ($/10ft)</label>
+                            <input type="number" min="0" step="0.01" id="cornerbead-cost" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Primer ($/gallon)</label>
+                            <input type="number" min="0" step="0.01" id="primer-cost" value="35">
+                        </div>
+                        <div class="form-group">
+                            <label>Labor Rate ($/sq ft)</label>
+                            <input type="number" min="0" step="0.01" id="labor-rate" value="2.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Waste Factor (%)</label>
+                            <input type="number" min="0" max="50" id="waste-factor" value="10">
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="checkbox-container">
+                        <div class="checkbox-label">
+                            <input type="checkbox" id="include-ceiling" checked>
+                            <label>Include Ceilings</label>
+                        </div>
+                        <div class="checkbox-label">
+                            <input type="checkbox" id="include-texture">
+                            <label>Add Texture Finish</label>
+                        </div>
+                        <div class="checkbox-label">
+                            <input type="checkbox" id="include-primer" checked>
+                            <label>Include Primer</label>
+                        </div>
+                        <div class="checkbox-label">
+                            <input type="checkbox" id="use-moisture-resistant">
+                            <label>Use Moisture-Resistant Drywall</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 style="margin-bottom: 0;">Estimate Results</h2>
+                        <button id="calculate-btn" class="btn btn-sm btn-success">
+                            <span class="btn-icon">✓</span> Calculate
+                        </button>
+                    </div>
+                    
+                    <div class="result-row">
+                        <div class="result-label">Total Wall Area:</div>
+                        <div id="total-wall-area">0 sq ft</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Total Ceiling Area:</div>
+                        <div id="total-ceiling-area">0 sq ft</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Total Area:</div>
+                        <div id="total-area">0 sq ft</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materials-table-body">
+                            <!-- Material rows will be inserted here -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="result-row">
+                        <div class="result-label">Material Cost:</div>
+                        <div id="material-cost">$0</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">Labor Cost:</div>
+                        <div id="labor-cost">$0</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="result-row">
+                        <div class="result-label" style="font-size: 1.125rem;">Total Estimated Cost:</div>
+                        <div id="total-cost" class="final-cost">$0</div>
+                    </div>
+                    
+                    <div class="export-options">
+                        <button id="save-estimate-btn" class="btn">
+                            <span class="btn-icon">💾</span> Save Estimate
+                        </button>
+                        <button id="print-estimate-btn" class="btn btn-outline">
+                            <span class="btn-icon">🖨️</span> Print
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Notes Card -->
+                <div class="card">
+                    <h3 style="margin-top: 0;">Additional Information</h3>
+                    <ul class="notes">
+                        <li><strong>Standard drywall sheets</strong> are 4'×8' (32 sq ft)</li>
+                        <li><strong>Door sizes:</strong> Standard interior door (3'×7'), entry door (3'6"×8')</li>
+                        <li><strong>Window sizes:</strong> Based on actual dimensions in blueprint</li>
+                        <li><strong>Labor costs include:</strong> Hanging, taping, mudding, sanding, and finishing</li>
+                        <li><strong>Moisture-resistant drywall</strong> is recommended for bathrooms and kitchens</li>
+                        <li><strong>Corner beads</strong> are calculated based on vertical corners in the blueprint</li>
+                        <li><strong>Local prices may vary</strong> - adjust material costs as needed for your area</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="preset-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Load Price Presets</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Select Region</label>
+                <select id="region-select">
+                    <option value="national">National Average</option>
+                    <option value="northeast">Northeast</option>
+                    <option value="southeast">Southeast</option>
+                    <option value="midwest">Midwest</option>
+                    <option value="southwest">Southwest</option>
+                    <option value="west">West Coast</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Quality Grade</label>
+                <select id="quality-select">
+                    <option value="standard">Standard</option>
+                    <option value="premium">Premium</option>
+                    <option value="economy">Economy</option>
+                </select>
+            </div>
+            <button id="apply-preset-btn" class="btn btn-block">Apply Preset</button>
+        </div>
+    </div>
+    
+    <div id="room-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="room-details-title">Room Details</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="room-details-content">
+                <!-- Room details will be shown here -->
+            </div>
+            <button id="save-room-details-btn" class="btn btn-block">Save Details</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Global variables
+            let roomCount = 0;
+            let activeTool = 'wall';
+            let scale = 20; // pixels per foot
+            let zoomLevel = 1;
+            let panOffset = { x: 0, y: 0 };
+            let isPanning = false;
+            let lastPanPoint = { x: 0, y: 0 };
+            let walls = [];
+            let doors = [];
+            let windows = [];
+            let rooms = [];
+            let drawingLine = null;
+            let selectedElement = null;
+            let isDrawing = false;
+            let startPoint = null;
+            let currentEstimate = null;
+            
+            // DOM elements
+            const roomsContainer = document.getElementById('rooms-container');
+            const detectedRoomsContainer = document.getElementById('detected-rooms-container');
+            const addRoomBtn = document.getElementById('add-room-btn');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const analyzeBtn = document.getElementById('analyze-blueprint-btn');
+            const resetCanvasBtn = document.getElementById('reset-canvas-btn');
+            const saveEstimateBtn = document.getElementById('save-estimate-btn');
+            const printEstimateBtn = document.getElementById('print-estimate-btn');
+            const presetPricingBtn = document.getElementById('preset-pricing-btn');
+            const saveBlueprintBtn = document.getElementById('save-blueprint-btn');
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+            
+            // Canvas elements
+            const blueprintContainer = document.getElementById('blueprint-container');
+            const blueprintCanvas = document.getElementById('blueprint-canvas');
+            const gridCanvas = document.getElementById('grid-canvas');
+            const ctx = blueprintCanvas.getContext('2d');
+            const gridCtx = gridCanvas.getContext('2d');
+            
+            // Material cost inputs
+            const drywallCost = document.getElementById('drywall-cost');
+            const mudCost = document.getElementById('mud-cost');
+            const tapeCost = document.getElementById('tape-cost');
+            const screwsCost = document.getElementById('screws-cost');
+            const cornerbeadCost = document.getElementById('cornerbead-cost');
+            const primerCost = document.getElementById('primer-cost');
+            const laborRate = document.getElementById('labor-rate');
+            const wasteFactor = document.getElementById('waste-factor');
+          
+            // Additional options
+            const includeCeiling = document.getElementById('include-ceiling');
+            const includeTexture = document.getElementById('include-texture');
+            const includePrimer = document.getElementById('include-primer');
+            const useMoistureResistant = document.getElementById('use-moisture-resistant');
+            
+            // Result elements
+            const totalWallArea = document.getElementById('total-wall-area');
+            const totalCeilingArea = document.getElementById('total-ceiling-area');
+            const totalArea = document.getElementById('total-area');
+            const materialsTableBody = document.getElementById('materials-table-body');
+            const materialCost = document.getElementById('material-cost');
+            const laborCost = document.getElementById('labor-cost');
+            const totalCost = document.getElementById('total-cost');
+            
+            // Modal elements
+            const presetModal = document.getElementById('preset-modal');
+            const roomDetailsModal = document.getElementById('room-details-modal');
+            const roomDetailsTitle = document.getElementById('room-details-title');
+            const roomDetailsContent = document.getElementById('room-details-content');
+            const saveRoomDetailsBtn = document.getElementById('save-room-details-btn');
+            const closeModalButtons = document.querySelectorAll('.close-modal');
+            const applyPresetBtn = document.getElementById('apply-preset-btn');
+            const regionSelect = document.getElementById('region-select');
+            const qualitySelect = document.getElementById('quality-select');
+            
+            // Function to calculate estimate
+            function calculateEstimate() {
+                // Initialize totals
+                let wallArea = 0;
+                let ceilingArea = 0;
+                let doorArea = 0;
+                let windowArea = 0;
+                let totalCorners = 0;
+                
+                // Process manually entered rooms
+                rooms.forEach(room => {
+                    // Calculate room wall area
+                    const perimeter = 2 * (room.width + room.length);
+                    const roomWallArea = perimeter * room.height;
+                    
+                    // Subtract doors (standard door: 3ft × 7ft = 21 sq ft)
+                    doorArea += room.doors * 21;
+                    
+                    // Subtract windows (average window: 3ft × 4ft = 12 sq ft)
+                    windowArea += room.windows * 12;
+                    
+                    // Add to wall area total
+                    wallArea += roomWallArea;
+                    
+                    // Add ceiling if included
+                    if (room.includeCeiling || includeCeiling.checked) {
+                        ceilingArea += room.width * room.length;
+                    }
+                    
+                    // Count corners (4 per regular room)
+                    totalCorners += 4;
+                });
+                
+                // Process walls from blueprint
+                if (walls.length > 0) {
+                    // Calculate total wall length
+                    let blueprintWallLength = 0;
+                    walls.forEach(wall => {
+                        const length = calculateDistance(wall.start, wall.end) / (scale * zoomLevel);
+                        blueprintWallLength += length;
+                    });
+                    
+                    // Assume standard ceiling height of 8ft if not specified
+                    const defaultHeight = 8;
+                    const blueprintWallArea = blueprintWallLength * defaultHeight;
+                    
+                    // Add to wall area
+                    wallArea += blueprintWallArea;
+                    
+                    // Subtract doors from blueprint
+                    doors.forEach(door => {
+                        const doorWidth = calculateDistance(door.start, door.end) / (scale * zoomLevel);
+                        const doorHeight = 7; // Standard door height
+                        doorArea += doorWidth * doorHeight;
+                    });
+                    
+                    // Subtract windows from blueprint
+                    windows.forEach(window => {
+                        const windowWidth = calculateDistance(window.start, window.end) / (scale * zoomLevel);
+                        const windowHeight = 4; // Standard window height
+                        windowArea += windowWidth * windowHeight;
+                    });
+                    
+                    // Estimate corners based on wall connections
+                    // This is a simplified approach
+                    totalCorners += Math.floor(walls.length * 0.4);
+                }
+                
+                // Calculate net wall area (subtract doors and windows)
+                const netWallArea = wallArea - doorArea - windowArea;
+                
+                // Apply waste factor
+                const wasteFactorValue = parseFloat(document.getElementById('waste-factor').value) / 100;
+                const totalDrywallArea = (netWallArea + ceilingArea) * (1 + wasteFactorValue);
+                
+                // Calculate materials
+                const sheetArea = 32; // 4ft × 8ft sheet
+                const sheetsNeeded = Math.ceil(totalDrywallArea / sheetArea);
+                
+                const drywallSheetCost = parseFloat(drywallCost.value);
+                const usesMoistureResistant = useMoistureResistant.checked;
+                
+                // Adjust cost for moisture resistant drywall if selected
+                const actualDrywallCost = usesMoistureResistant ? drywallSheetCost * 1.5 : drywallSheetCost;
+                
+                // Calculate other materials
+                const jointsPerSheet = 3; // Estimate
+                const tapeFeetPerSheet = 6; // Estimate
+                const screwsPerSheet = 30; // Estimate
+
+                // Calculate joint compound needed (1 bucket covers ~8 sheets)
+                const bucketsNeeded = Math.ceil(sheetsNeeded / 8);
+                const mudCostValue = parseFloat(mudCost.value);
+                
+                // Calculate tape needed (1 roll = 75 feet)
+                const tapeFeetNeeded = tapeFeetPerSheet * sheetsNeeded;
+                const tapeRollsNeeded = Math.ceil(tapeFeetNeeded / 75);
+                const tapeCostValue = parseFloat(tapeCost.value);
+                
+                // Calculate screws needed (1 lb = ~200 screws)
+                const screwsNeeded = screwsPerSheet * sheetsNeeded;
+                const screwPoundsNeeded = Math.ceil(screwsNeeded / 200);
+                const screwsCostValue = parseFloat(screwsCost.value);
+                
+                // Calculate corner beads (in linear feet)
+                const cornerbeadFeet = totalCorners * 8; // Assuming 8 ft height
+                const cornerbeadUnits = Math.ceil(cornerbeadFeet / 10); // Units of 10 feet
+                const cornerbeadCostValue = parseFloat(cornerbeadCost.value);
+                
+                // Calculate primer (1 gallon covers ~300 sq ft)
+                let primerGallonsNeeded = 0;
+                if (includePrimer.checked) {
+                    primerGallonsNeeded = Math.ceil(totalDrywallArea / 300);
+                }
+                const primerCostValue = parseFloat(primerCost.value);
+                
+                // Calculate texture materials if needed
+                let textureCost = 0;
+                if (includeTexture.checked) {
+                    // Estimate 1 texture bag per 500 sq ft
+                    const textureBagsNeeded = Math.ceil(totalDrywallArea / 500);
+                    textureCost = textureBagsNeeded * 15; // $15 per bag is average cost
+                }
+                
+                // Calculate total material cost
+                const totalDrywallCost = sheetsNeeded * actualDrywallCost;
+                const totalMudCost = bucketsNeeded * mudCostValue;
+                const totalTapeCost = tapeRollsNeeded * tapeCostValue;
+                const totalScrewsCost = screwPoundsNeeded * screwsCostValue;
+                const totalCornerbeadCost = cornerbeadUnits * cornerbeadCostValue;
+                const totalPrimerCost = primerGallonsNeeded * primerCostValue;
+                
+                const totalMaterialCost = totalDrywallCost + totalMudCost + totalTapeCost + 
+                                        totalScrewsCost + totalCornerbeadCost + totalPrimerCost + textureCost;
+                
+                // Calculate labor cost
+                const laborRateValue = parseFloat(laborRate.value);
+                const totalLaborCost = totalDrywallArea * laborRateValue;
+                
+                // Calculate total cost
+                const grandTotalCost = totalMaterialCost + totalLaborCost;
+                
+                // Update the result elements
+                totalWallArea.textContent = `${Math.round(netWallArea)} sq ft`;
+                totalCeilingArea.textContent = `${Math.round(ceilingArea)} sq ft`;
+                totalArea.textContent = `${Math.round(totalDrywallArea)} sq ft`;
+                
+                materialCost.textContent = `$${totalMaterialCost.toFixed(2)}`;
+                laborCost.textContent = `$${totalLaborCost.toFixed(2)}`;
+                totalCost.textContent = `$${grandTotalCost.toFixed(2)}`;
+                
+                // Populate materials table
+                materialsTableBody.innerHTML = '';
+                
+                const materials = [
+                    {name: `Drywall Sheets (${usesMoistureResistant ? 'Moisture Resistant' : 'Standard'})`, 
+                    quantity: `${sheetsNeeded} sheets`, 
+                    unit: `$${actualDrywallCost.toFixed(2)}`, 
+                    total: `$${totalDrywallCost.toFixed(2)}`},
+                    {name: 'Joint Compound', 
+                    quantity: `${bucketsNeeded} buckets`, 
+                    unit: `$${mudCostValue.toFixed(2)}`, 
+                    total: `$${totalMudCost.toFixed(2)}`},
+                    {name: 'Joint Tape', 
+                    quantity: `${tapeRollsNeeded} rolls`, 
+                    unit: `$${tapeCostValue.toFixed(2)}`, 
+                    total: `$${totalTapeCost.toFixed(2)}`},
+                    {name: 'Screws', 
+                    quantity: `${screwPoundsNeeded} lbs`, 
+                    unit: `$${screwsCostValue.toFixed(2)}`, 
+                    total: `$${totalScrewsCost.toFixed(2)}`},
+                    {name: 'Corner Bead', 
+                    quantity: `${cornerbeadUnits} units (10ft)`, 
+                    unit: `$${cornerbeadCostValue.toFixed(2)}`, 
+                    total: `$${totalCornerbeadCost.toFixed(2)}`}
+                ];
+                
+                if (includePrimer.checked) {
+                    materials.push({
+                        name: 'Primer', 
+                        quantity: `${primerGallonsNeeded} gallons`, 
+                        unit: `$${primerCostValue.toFixed(2)}`, 
+                        total: `$${totalPrimerCost.toFixed(2)}`
+                    });
+                }
+                
+                if (includeTexture.checked) {
+                    materials.push({
+                        name: 'Texture Materials', 
+                        quantity: `${Math.ceil(totalDrywallArea / 500)} bags`, 
+                        unit: '$15.00', 
+                        total: `$${textureCost.toFixed(2)}`
+                    });
+                }
+                
+                materials.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.unit}</td>
+                        <td>${item.total}</td>
+                    `;
+                    materialsTableBody.appendChild(row);
+                });
+
+                // Save current estimate for later use
+                currentEstimate = {
+                    wallArea: netWallArea,
+                    ceilingArea: ceilingArea,
+                    totalArea: totalDrywallArea,
+                    materials: materials,
+                    materialCost: totalMaterialCost,
+                    laborCost: totalLaborCost,
+                    totalCost: grandTotalCost
+                };
+                
+                return currentEstimate;
+            }
+
+            // Canvas drawing functions
+        function initCanvas() {
+            // Set canvas dimensions to match container
+            const containerRect = blueprintContainer.getBoundingClientRect();
+            blueprintCanvas.width = containerRect.width;
+            blueprintCanvas.height = containerRect.height;
+            gridCanvas.width = containerRect.width;
+            gridCanvas.height = containerRect.height;
+            
+            // Position canvases properly inside container
+            blueprintCanvas.style.position = 'absolute';
+            blueprintCanvas.style.top = '0';
+            blueprintCanvas.style.left = '0';
+            gridCanvas.style.position = 'absolute';
+            gridCanvas.style.top = '0';
+            gridCanvas.style.left = '0';
+            
+            // Make sure canvases are visible and clickable
+            blueprintCanvas.style.zIndex = '2';
+            gridCanvas.style.zIndex = '1';
+
+            console.log('Canvas initialized with dimensions:', blueprintCanvas.width, 'x', blueprintCanvas.height);
+            
+            // Initialize drawing context explicitly
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            gridCtx.lineCap = 'round';
+            gridCtx.lineJoin = 'round';
+            
+            // Set default tool
+            document.querySelector('.draw-tool[data-tool="wall"]').classList.add('active');
+            
+            // Initial draw
+            drawGrid();
+            drawBlueprint();
+        }
+
+        // Add window resize handler to adjust canvas size
+        window.addEventListener('resize', function() {
+            // Delay to ensure proper size calculation
+            setTimeout(initCanvas, 100);
+        });
+
+            function drawGrid() {
+                const width = gridCanvas.width;
+                const height = gridCanvas.height;
+                
+                // Clear grid canvas
+                gridCtx.clearRect(0, 0, width, height);
+                
+                // Adjust grid spacing based on zoom level
+                const gridSpacing = scale * zoomLevel;
+                
+                // Apply pan offset
+                const offsetX = panOffset.x % gridSpacing;
+                const offsetY = panOffset.y % gridSpacing;
+                
+                // Draw vertical lines
+                gridCtx.beginPath();
+                gridCtx.strokeStyle = '#e2e8f0';
+                gridCtx.lineWidth = 1;
+                for (let x = offsetX; x < width; x += gridSpacing) {
+                    gridCtx.moveTo(x, 0);
+                    gridCtx.lineTo(x, height);
+                }
+                
+                // Draw horizontal lines
+                for (let y = offsetY; y < height; y += gridSpacing) {
+                    gridCtx.moveTo(0, y);
+                    gridCtx.lineTo(width, y);
+                }
+                gridCtx.stroke();
+                
+                // Draw major grid lines (every 5 feet)
+                const majorGridSpacing = gridSpacing * 5;
+                const majorOffsetX = panOffset.x % majorGridSpacing;
+                const majorOffsetY = panOffset.y % majorGridSpacing;
+                
+                gridCtx.beginPath();
+                gridCtx.strokeStyle = '#cbd5e0';
+                gridCtx.lineWidth = 2;
+                
+                for (let x = majorOffsetX; x < width; x += majorGridSpacing) {
+                    gridCtx.moveTo(x, 0);
+                    gridCtx.lineTo(x, height);
+                }
+                
+                for (let y = majorOffsetY; y < height; y += majorGridSpacing) {
+                    gridCtx.moveTo(0, y);
+                    gridCtx.lineTo(width, y);
+                }
+                gridCtx.stroke();
+            }
+
+            function drawBlueprint() {
+                // Clear blueprint canvas
+                ctx.clearRect(0, 0, blueprintCanvas.width, blueprintCanvas.height);
+                
+                // Draw walls
+                walls.forEach(wall => {
+                    drawWall(wall);
+                });
+                
+                // Draw doors
+                doors.forEach(door => {
+                    drawDoor(door);
+                });
+                
+                // Draw windows
+                windows.forEach(window => {
+                    drawWindow(window);
+                });
+                
+                // Draw room labels if any
+                rooms.forEach(room => {
+                    if (room.center) { // Only if room has a defined center point
+                        drawRoomLabel(room);
+                    }
+                });
+                
+                // Draw selected element highlight
+                if (selectedElement) {
+                    if (selectedElement.type === 'wall') {
+                        highlightWall(selectedElement);
+                    } else if (selectedElement.type === 'door') {
+                        highlightDoor(selectedElement);
+                    } else if (selectedElement.type === 'window') {
+                        highlightWindow(selectedElement);
+                    }
+                }
+                
+                // Draw active drawing line if any
+                if (drawingLine) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#3182ce';
+                    ctx.lineWidth = 3;
+                    ctx.moveTo(drawingLine.start.x, drawingLine.start.y);
+                    ctx.lineTo(drawingLine.end.x, drawingLine.end.y);
+                    ctx.stroke();
+                }
+            }
+
+            function drawWall(wall) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#2d3748';
+                ctx.lineWidth = 5 * zoomLevel;
+                ctx.moveTo(wall.start.x, wall.start.y);
+                ctx.lineTo(wall.end.x, wall.end.y);
+                ctx.stroke();
+                
+                // Draw length measurement
+                const length = calculateDistance(wall.start, wall.end);
+                const lengthInFeet = (length / (scale * zoomLevel)).toFixed(1);
+                
+                const midX = (wall.start.x + wall.end.x) / 2;
+                const midY = (wall.start.y + wall.end.y) / 2;
+                
+                ctx.font = `${12 * zoomLevel}px Arial`;
+                ctx.fillStyle = '#4a5568';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Calculate perpendicular offset for text
+                const angle = Math.atan2(wall.end.y - wall.start.y, wall.end.x - wall.start.x);
+                const perpAngle = angle + Math.PI / 2;
+                const offset = 15 * zoomLevel;
+                
+                ctx.fillText(`${lengthInFeet}'`, 
+                    midX + Math.cos(perpAngle) * offset, 
+                    midY + Math.sin(perpAngle) * offset);
+            }
+
+            function drawDoor(door) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#9c4221';
+                ctx.lineWidth = 3 * zoomLevel;
+                
+                // Draw door frame
+                ctx.moveTo(door.start.x, door.start.y);
+                ctx.lineTo(door.end.x, door.end.y);
+                
+                // Draw door swing arc
+                const doorLength = calculateDistance(door.start, door.end);
+                const angle = Math.atan2(door.end.y - door.start.y, door.end.x - door.start.x);
+                const startAngle = angle + Math.PI / 2;
+                const endAngle = angle + Math.PI;
+                
+                ctx.arc(door.start.x, door.start.y, doorLength, startAngle, endAngle);
+                ctx.stroke();
+            }
+
+            function drawWindow(window) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#2b6cb0';
+                ctx.lineWidth = 3 * zoomLevel;
+                
+                // Draw window frame
+                ctx.moveTo(window.start.x, window.start.y);
+                ctx.lineTo(window.end.x, window.end.y);
+                
+                // Draw window panes
+                const angle = Math.atan2(window.end.y - window.start.y, window.end.x - window.start.x);
+                const perpAngle = angle + Math.PI / 2;
+                const windowLength = calculateDistance(window.start, window.end);
+                const paneWidth = 3 * zoomLevel;
+                
+                const midX = (window.start.x + window.end.x) / 2;
+                const midY = (window.start.y + window.end.y) / 2;
+                
+                // Draw cross in center of window
+                ctx.moveTo(midX - Math.cos(perpAngle) * paneWidth, midY - Math.sin(perpAngle) * paneWidth);
+                ctx.lineTo(midX + Math.cos(perpAngle) * paneWidth, midY + Math.sin(perpAngle) * paneWidth);
+                ctx.stroke();
+            }
+
+            function drawRoomLabel(room) {
+                ctx.font = `${14 * zoomLevel}px Arial`;
+                ctx.fillStyle = 'rgba(49, 130, 206, 0.8)';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(room.name, room.center.x, room.center.y);
+            }
+
+            function highlightWall(wall) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#3182ce';
+                ctx.lineWidth = 7 * zoomLevel;
+                ctx.moveTo(wall.start.x, wall.start.y);
+                ctx.lineTo(wall.end.x, wall.end.y);
+                ctx.stroke();
+            }
+
+            function highlightDoor(door) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#dd6b20';
+                ctx.lineWidth = 5 * zoomLevel;
+                ctx.moveTo(door.start.x, door.start.y);
+                ctx.lineTo(door.end.x, door.end.y);
+                ctx.stroke();
+            }
+
+            function highlightWindow(window) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#3182ce';
+                ctx.lineWidth = 5 * zoomLevel;
+                ctx.moveTo(window.start.x, window.start.y);
+                ctx.lineTo(window.end.x, window.end.y);
+                ctx.stroke();
+            }
+
+            // Blueprint interaction functions
+            function getMousePosition(evt) {
+                const rect = blueprintCanvas.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
+                };
+            }
+
+            function snapToGrid(position) {
+                const gridSize = scale * zoomLevel;
+                return {
+                    x: Math.round((position.x - panOffset.x) / gridSize) * gridSize + panOffset.x,
+                    y: Math.round((position.y - panOffset.y) / gridSize) * gridSize + panOffset.y
+                };
+            }
+
+            function calculateDistance(point1, point2) {
+                const dx = point2.x - point1.x;
+                const dy = point2.y - point1.y;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+
+            function findClosestWall(point, maxDistance) {
+                let closestWall = null;
+                let minDistance = maxDistance || 10;
+                
+                walls.forEach(wall => {
+                    const distance = distanceToLine(point, wall);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestWall = wall;
+                    }
+                });
+                
+                return closestWall;
+            }
+
+            function distanceToLine(point, line) {
+                const { start, end } = line;
+                
+                const lineLength = calculateDistance(start, end);
+                if (lineLength === 0) return calculateDistance(point, start);
+                
+                // Calculate projection
+                const t = ((point.x - start.x) * (end.x - start.x) + 
+                        (point.y - start.y) * (end.y - start.y)) / 
+                        (lineLength * lineLength);
+                
+                // Check if projection falls outside line segment
+                if (t < 0) return calculateDistance(point, start);
+                if (t > 1) return calculateDistance(point, end);
+                
+                // Calculate projected point on line
+                const projectedPoint = {
+                    x: start.x + t * (end.x - start.x),
+                    y: start.y + t * (end.y - start.y)
+                };
+                
+                return calculateDistance(point, projectedPoint);
+            }
+
+            function projectPointOnLine(point, line) {
+                const { start, end } = line;
+                
+                const lineLength = calculateDistance(start, end);
+                if (lineLength === 0) return start;
+                
+                const t = ((point.x - start.x) * (end.x - start.x) + 
+                        (point.y - start.y) * (end.y - start.y)) / 
+                        (lineLength * lineLength);
+                
+                // Clamp t to stay on the line segment
+                const tClamped = Math.max(0, Math.min(1, t));
+                
+                return {
+                    x: start.x + tClamped * (end.x - start.x),
+                    y: start.y + tClamped * (end.y - start.y)
+                };
+            }
+
+            function detectRoom(walls) {
+                // Basic room detection algorithm
+                // This is a simplified version - real room detection would be more complex
+                // and would need to handle various room shapes
+                
+                // Find closed paths by checking wall connections
+                const nodes = {};
+                
+                // Build graph of connected nodes
+                walls.forEach((wall, idx) => {
+                    // Convert points to strings for use as object keys
+                    const startKey = `${wall.start.x},${wall.start.y}`;
+                    const endKey = `${wall.end.x},${wall.end.y}`;
+                    
+                    if (!nodes[startKey]) nodes[startKey] = [];
+                    if (!nodes[endKey]) nodes[endKey] = [];
+                    
+                    nodes[startKey].push(endKey);
+                    nodes[endKey].push(startKey);
+                });
+                
+                // Find cycles in graph (simple implementation)
+                // Real implementation would need more sophisticated algorithm
+                const detectedRooms = [];
+                
+                // Example of finding a simple rectangular room
+                for (const startNode in nodes) {
+                    if (nodes[startNode].length >= 2) {
+                        const [n1, n2] = nodes[startNode];
+                        
+                        // Check if n1 and n2 are connected to other nodes that are also connected
+                        const n1Connections = nodes[n1] || [];
+                        const n2Connections = nodes[n2] || [];
+                        
+                        for (const n1c of n1Connections) {
+                            if (n1c !== startNode && n2Connections.includes(n1c)) {
+                                // Found a cycle (room)
+                                const points = [startNode, n1, n1c, n2].map(point => {
+                                    const [x, y] = point.split(',').map(Number);
+                                    return {x, y};
+                                });
+                                
+                                // Calculate room center
+                                const center = {
+                                    x: points.reduce((sum, p) => sum + p.x, 0) / points.length,
+                                    y: points.reduce((sum, p) => sum + p.y, 0) / points.length
+                                };
+                                
+                                // Calculate room area
+                                const area = calculatePolygonArea(points);
+                                
+                                detectedRooms.push({
+                                    name: `Room ${detectedRooms.length + 1}`,
+                                    points,
+                                    center,
+                                    area: area / (scale * scale * zoomLevel * zoomLevel), // Convert to sq feet
+                                    width: Math.sqrt(area) / (scale * zoomLevel),
+                                    length: Math.sqrt(area) / (scale * zoomLevel),
+                                    height: 8, // Default height
+                                    includeCeiling: true
+                                });
+                                
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                return detectedRooms;
+            }
+
+            function calculatePolygonArea(points) {
+                let area = 0;
+                for (let i = 0; i < points.length; i++) {
+                    const j = (i + 1) % points.length;
+                    area += points[i].x * points[j].y;
+                    area -= points[j].x * points[i].y;
+                }
+                return Math.abs(area / 2);
+            }
+
+            // Room management functions
+            function addRoom() {
+                roomCount++;
+                const roomId = `room-${roomCount}`;
+                const room = {
+                    id: roomId,
+                    name: `Room ${roomCount}`,
+                    width: 12,
+                    length: 10,
+                    height: 8,
+                    includeCeiling: true,
+                    doors: 1,
+                    windows: 1,
+                    type: 'standard'
+                };
+                rooms.push(room);
+                
+                const roomElement = document.createElement('div');
+                roomElement.className = 'room';
+                roomElement.id = roomId;
+                roomElement.innerHTML = `
+                    <div class="room-header">
+                        <input type="text" class="room-name" value="${room.name}" data-room-id="${roomId}">
+                        <div>
+                            <button class="btn btn-sm btn-outline edit-room-btn" data-room-id="${roomId}">Edit</button>
+                            <button class="btn btn-sm btn-danger delete-room-btn" data-room-id="${roomId}">✕</button>
+                        </div>
+                    </div>
+                    <div class="room-grid">
+                        <div class="form-group">
+                            <label>Width (ft)</label>
+                            <input type="number" min="1" class="room-width" value="${room.width}" data-room-id="${roomId}">
+                        </div>
+                        <div class="form-group">
+                            <label>Length (ft)</label>
+                            <input type="number" min="1" class="room-length" value="${room.length}" data-room-id="${roomId}">
+                        </div>
+                        <div class="form-group">
+                            <label>Height (ft)</label>
+                            <input type="number" min="1" class="room-height" value="${room.height}" data-room-id="${roomId}">
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select class="room-type" data-room-id="${roomId}">
+                                <option value="standard" ${room.type === 'standard' ? 'selected' : ''}>Standard</option>
+                                <option value="bathroom" ${room.type === 'bathroom' ? 'selected' : ''}>Bathroom</option>
+                                <option value="kitchen" ${room.type === 'kitchen' ? 'selected' : ''}>Kitchen</option>
+                                <option value="garage" ${room.type === 'garage' ? 'selected' : ''}>Garage</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Doors</label>
+                            <input type="number" min="0" class="room-doors" value="${room.doors}" data-room-id="${roomId}">
+                        </div>
+                        <div class="form-group">
+                            <label>Windows</label>
+                            <input type="number" min="0" class="room-windows" value="${room.windows}" data-room-id="${roomId}">
+                        </div>
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" class="room-include-ceiling" ${room.includeCeiling ? 'checked' : ''} data-room-id="${roomId}">
+                        <label>Include Ceiling</label>
+                    </div>
+                `;
+                
+                roomsContainer.appendChild(roomElement);
+                
+                // Add event listeners to room inputs
+                roomElement.querySelector('.room-name').addEventListener('input', updateRoom);
+                roomElement.querySelector('.room-width').addEventListener('change', updateRoom);
+                roomElement.querySelector('.room-length').addEventListener
+                            roomElement.querySelector('.room-name').addEventListener('input', updateRoom);
+                roomElement.querySelector('.room-width').addEventListener('change', updateRoom);
+                roomElement.querySelector('.room-length').addEventListener('change', updateRoom);
+                roomElement.querySelector('.room-height').addEventListener('change', updateRoom);
+                roomElement.querySelector('.room-type').addEventListener('change', updateRoom);
+                roomElement.querySelector('.room-doors').addEventListener('change', updateRoom);
+                roomElement.querySelector('.room-windows').addEventListener('change', updateRoom);
+                roomElement.querySelector('.room-include-ceiling').addEventListener('change', updateRoom);
+                roomElement.querySelector('.delete-room-btn').addEventListener('click', deleteRoom);
+                roomElement.querySelector('.edit-room-btn').addEventListener('click', editRoom);
+            }
+
+            function updateRoom(event) {
+                const roomId = event.target.dataset.roomId;
+                const room = rooms.find(room => room.id === roomId);
+                if (!room) return;
+                
+                if (event.target.classList.contains('room-name')) {
+                    room.name = event.target.value;
+                } else if (event.target.classList.contains('room-width')) {
+                    room.width = parseFloat(event.target.value);
+                } else if (event.target.classList.contains('room-length')) {
+                    room.length = parseFloat(event.target.value);
+                } else if (event.target.classList.contains('room-height')) {
+                    room.height = parseFloat(event.target.value);
+                } else if (event.target.classList.contains('room-type')) {
+                    room.type = event.target.value;
+                } else if (event.target.classList.contains('room-doors')) {
+                    room.doors = parseInt(event.target.value);
+                } else if (event.target.classList.contains('room-windows')) {
+                    room.windows = parseInt(event.target.value);
+                } else if (event.target.classList.contains('room-include-ceiling')) {
+                    room.includeCeiling = event.target.checked;
+                }
+            }
+
+            function deleteRoom(event) {
+                const roomId = event.target.dataset.roomId;
+                const roomIndex = rooms.findIndex(room => room.id === roomId);
+                if (roomIndex !== -1) {
+                    rooms.splice(roomIndex, 1);
+                    const roomElement = document.getElementById(roomId);
+                    roomElement.remove();
+                }
+            }
+
+            function editRoom(event) {
+                const roomId = event.target.dataset.roomId;
+                const room = rooms.find(room => room.id === roomId);
+                if (!room) return;
+                
+                roomDetailsTitle.textContent = `Edit ${room.name}`;
+                
+                roomDetailsContent.innerHTML = `
+                    <div class="form-group">
+                        <label>Room Name</label>
+                        <input type="text" id="modal-room-name" value="${room.name}">
+                    </div>
+                    <div class="form-group">
+                        <label>Room Type</label>
+                        <select id="modal-room-type">
+                            <option value="standard" ${room.type === 'standard' ? 'selected' : ''}>Standard</option>
+                            <option value="bathroom" ${room.type === 'bathroom' ? 'selected' : ''}>Bathroom</option>
+                            <option value="kitchen" ${room.type === 'kitchen' ? 'selected' : ''}>Kitchen</option>
+                            <option value="garage" ${room.type === 'garage' ? 'selected' : ''}>Garage</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Height (ft)</label>
+                        <input type="number" min="1" step="0.1" id="modal-room-height" value="${room.height}">
+                    </div>
+                    <div class="form-group">
+                        <label>Doors</label>
+                        <input type="number" min="0" id="modal-room-doors" value="${room.doors}">
+                    </div>
+                    <div class="form-group">
+                        <label>Windows</label>
+                        <input type="number" min="0" id="modal-room-windows" value="${room.windows}">
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="modal-include-ceiling" ${room.includeCeiling ? 'checked' : ''}>
+                        <label>Include Ceiling</label>
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="modal-moisture-resistant" ${room.moistureResistant ? 'checked' : ''}>
+                        <label>Use Moisture-Resistant Drywall</label>
+                    </div>
+                    <input type="hidden" id="modal-room-id" value="${roomId}">
+                `;
+                
+                roomDetailsModal.style.display = 'flex';
+            }
+
+            function saveRoomDetails() {
+                const roomId = document.getElementById('modal-room-id').value;
+                const room = rooms.find(room => room.id === roomId);
+                if (!room) return;
+                
+                room.name = document.getElementById('modal-room-name').value;
+                room.type = document.getElementById('modal-room-type').value;
+                room.height = parseFloat(document.getElementById('modal-room-height').value);
+                room.doors = parseInt(document.getElementById('modal-room-doors').value);
+                room.windows = parseInt(document.getElementById('modal-room-windows').value);
+                room.includeCeiling = document.getElementById('modal-include-ceiling').checked;
+                room.moistureResistant = document.getElementById('modal-moisture-resistant').checked;
+                
+                // Update the room display
+                const roomElement = document.getElementById(roomId);
+                roomElement.querySelector('.room-name').value = room.name;
+                roomElement.querySelector('.room-height').value = room.height;
+                roomElement.querySelector('.room-type').value = room.type;
+                roomElement.querySelector('.room-doors').value = room.doors;
+                roomElement.querySelector('.room-windows').value = room.windows;
+                roomElement.querySelector('.room-include-ceiling').checked = room.includeCeiling;
+                
+                // Close the modal
+                roomDetailsModal.style.display = 'none';
+            }
+
+            // Event handling for canvas interaction
+            function handleCanvasMouseDown(e) {
+                const pos = getMousePosition(e);
+                
+                if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
+                    // Middle mouse button or Ctrl+left click for panning
+                    isPanning = true;
+                    lastPanPoint = pos;
+                    blueprintCanvas.style.cursor = 'grabbing';
+                    return;
+                }
+                
+                if (e.button !== 0) return; // Only proceed with left mouse button
+                
+                if (activeTool === 'erase') {
+                    // Check if clicked on a wall, door, or window to delete
+                    const point = pos;
+                    const radius = 10 * zoomLevel;
+                    
+                    // Check walls
+                    for (let i = walls.length - 1; i >= 0; i--) {
+                        if (distanceToLine(point, walls[i]) < radius) {
+                            walls.splice(i, 1);
+                            drawBlueprint();
+                            return;
+                        }
+                    }
+                    
+                    // Check doors
+                    for (let i = doors.length - 1; i >= 0; i--) {
+                        if (distanceToLine(point, doors[i]) < radius) {
+                            doors.splice(i, 1);
+                            drawBlueprint();
+                            return;
+                        }
+                    }
+                    
+                    // Check windows
+                    for (let i = windows.length - 1; i >= 0; i--) {
+                        if (distanceToLine(point, windows[i]) < radius) {
+                            windows.splice(i, 1);
+                            drawBlueprint();
+                            return;
+                        }
+                    }
+                    
+                    return;
+                }
+                
+                // Start drawing
+                isDrawing = true;
+                startPoint = snapToGrid(pos);
+                
+                // If double-clicked on a wall, add door or window
+                if (e.detail === 2) {
+                    const wall = findClosestWall(pos, 10 * zoomLevel);
+                    if (wall) {
+                        // Add door or window at click point
+                        const projectedPoint = projectPointOnLine(pos, wall);
+                        
+                        if (activeTool === 'door' || activeTool === 'window') {
+                            const elementLength = 3 * scale * zoomLevel; // 3 feet default
+                            const wallAngle = Math.atan2(wall.end.y - wall.start.y, wall.end.x - wall.start.x);
+                            
+                            // Calculate element endpoints
+                            const startPoint = {
+                                x: projectedPoint.x - Math.cos(wallAngle) * elementLength / 2,
+                                y: projectedPoint.y - Math.sin(wallAngle) * elementLength / 2
+                            };
+                            
+                            const endPoint = {
+                                x: projectedPoint.x + Math.cos(wallAngle) * elementLength / 2,
+                                y: projectedPoint.y + Math.sin(wallAngle) * elementLength / 2
+                            };
+                            
+                            const element = {
+                                type: activeTool,
+                                start: startPoint,
+                                end: endPoint
+                            };
+                            
+                            if (activeTool === 'door') {
+                                doors.push(element);
+                            } else {
+                                windows.push(element);
+                            }
+                            
+                            drawBlueprint();
+                        }
+                    }
+                }
+            }
+
+            function handleCanvasMouseMove(e) {
+                const pos = getMousePosition(e);
+                
+                if (isPanning) {
+                    // Handle panning
+                    const dx = pos.x - lastPanPoint.x;
+                    const dy = pos.y - lastPanPoint.y;
+                    
+                    panOffset.x += dx;
+                    panOffset.y += dy;
+                    
+                    lastPanPoint = pos;
+                    
+                    drawGrid();
+                    drawBlueprint();
+                    return;
+                }
+                
+                if (!isDrawing) return;
+                
+                // Update drawing line
+                const endPoint = snapToGrid(pos);
+                
+                drawingLine = {
+                    type: activeTool,
+                    start: startPoint,
+                    end: endPoint
+                };
+                
+                drawBlueprint();
+            }
+
+            function handleCanvasMouseUp(e) {
+                if (isPanning) {
+                    isPanning = false;
+                    blueprintCanvas.style.cursor = 'crosshair';
+                    return;
+                }
+                
+                if (!isDrawing) return;
+                
+                isDrawing = false;
+                
+                if (!drawingLine) return;
+                
+                // Add the completed element to the appropriate array
+                const element = {
+                    type: activeTool,
+                    start: drawingLine.start,
+                    end: drawingLine.end
+                };
+                
+                // Only add if the line has some length
+                const length = calculateDistance(element.start, element.end);
+                if (length < 5) {
+                    drawingLine = null;
+                    drawBlueprint();
+                    return;
+                }
+                
+                if (activeTool === 'wall') {
+                    walls.push(element);
+                } else if (activeTool === 'door') {
+                    doors.push(element);
+                } else if (activeTool === 'window') {
+                    windows.push(element);
+                } else if (activeTool === 'room') {
+                    // Auto room creation not implemented in this basic version
+                    // Would require more complex algorithms
+                }
+                
+                drawingLine = null;
+                drawBlueprint();
+            }
+
+            // Price preset functionality
+            function loadPricePresets() {
+                presetModal.style.display = 'flex';
+            }
+
+            function applyPresets() {
+                const region = regionSelect.value;
+                const quality = qualitySelect.value;
+                
+                // Prices based on region and quality
+                const presets = {
+                    national: {
+                        standard: {
+                            drywall: 15.00,
+                            mud: 20.00,
+                            tape: 8.00,
+                            screws: 8.00,
+                            cornerbead: 5.00,
+                            primer: 35.00,
+                            labor: 2.50
+                        },
+                        premium: {
+                            drywall: 19.00,
+                            mud: 28.00,
+                            tape: 12.00,
+                            screws: 10.00,
+                            cornerbead: 7.00,
+                            primer: 45.00,
+                            labor: 3.50
+                        },
+                        economy: {
+                            drywall: 12.00,
+                            mud: 15.00,
+                            tape: 6.00,
+                            screws: 6.00,
+                            cornerbead: 4.00,
+                            primer: 25.00,
+                            labor: 1.80
+                        }
+                    },
+                    northeast: {
+                        standard: {
+                            drywall: 16.50,
+                            mud: 22.00,
+                            tape: 9.00,
+                            screws: 9.00,
+                            cornerbead: 5.50,
+                            primer: 38.00,
+                            labor: 3.00
+                        },
+                        premium: {
+                            drywall: 21.00,
+                            mud: 30.00,
+                            tape: 13.50,
+                            screws: 11.00,
+                            cornerbead: 7.50,
+                            primer: 49.00,
+                            labor: 4.25
+                        },
+                        economy: {
+                            drywall: 13.50,
+                            mud: 16.50,
+                            tape: 7.00,
+                            screws: 7.00,
+                            cornerbead: 4.50,
+                            primer: 28.00,
+                            labor: 2.20
+                        }
+                    },
+                    southeast: {
+                        standard: {
+                            drywall: 14.00,
+                            mud: 19.00,
+                            tape: 7.50,
+                            screws: 7.50,
+                            cornerbead: 4.75,
+                            primer: 32.00,
+                            labor: 2.25
+                        },
+                        premium: {
+                            drywall: 18.00,
+                            mud: 26.00,
+                            tape: 11.00,
+                            screws: 9.50,
+                            cornerbead: 6.50,
+                            primer: 42.00,
+                            labor: 3.25
+                        },
+                        economy: {
+                            drywall: 11.00,
+                            mud: 14.00,
+                            tape: 5.50,
+                            screws: 5.50,
+                            cornerbead: 3.75,
+                            primer: 23.00,
+                            labor: 1.60
+                        }
+                    },
+                    midwest: {
+                        standard: {
+                            drywall: 14.50,
+                            mud: 19.50,
+                            tape: 7.75,
+                            screws: 7.75,
+                            cornerbead: 4.85,
+                            primer: 33.00,
+                            labor: 2.35
+                        },
+                        premium: {
+                            drywall: 18.50,
+                            mud: 27.00,
+                            tape: 11.50,
+                            screws: 9.75,
+                            cornerbead: 6.75,
+                            primer: 43.00,
+                            labor: 3.35
+                        },
+                        economy: {
+                            drywall: 11.50,
+                            mud: 14.50,
+                            tape: 5.75,
+                            screws: 5.75,
+                            cornerbead: 3.85,
+                            primer: 24.00,
+                            labor: 1.70
+                        }
+                    },
+                    southwest: {
+                        standard: {
+                            drywall: 15.25,
+                            mud: 20.50,
+                            tape: 8.25,
+                            screws: 8.25,
+                            cornerbead: 5.10,
+                            primer: 36.00,
+                            labor: 2.60
+                        },
+                        premium: {
+                            drywall: 19.50,
+                            mud: 28.50,
+                            tape: 12.50,
+                            screws: 10.25,
+                            cornerbead: 7.25,
+                            primer: 46.00,
+                            labor: 3.70
+                        },
+                        economy: {
+                            drywall: 12.25,
+                            mud: 15.50,
+                            tape: 6.25,
+                            screws: 6.25,
+                            cornerbead: 4.10,
+                            primer: 26.00,
+                            labor: 1.85
+                        }
+                    },
+                    west: {
+                        standard: {
+                            drywall: 16.75,
+                            mud: 22.50,
+                            tape: 9.25,
+                            screws: 9.25,
+                            cornerbead: 5.60,
+                            primer: 39.00,
+                            labor: 3.10
+                        },
+                        premium: {
+                            drywall: 21.50,
+                            mud: 31.00,
+                            tape: 14.00,
+                            screws: 11.50,
+                            cornerbead: 7.75,
+                            primer: 50.00,
+                            labor: 4.50
+                        },
+                        economy: {
+                            drywall: 13.75,
+                            mud: 17.00,
+                            tape: 7.25,
+                            screws: 7.25,
+                            cornerbead: 4.60,
+                            primer: 29.00,
+                            labor: 2.30
+                        }
+                    }
+                };
+                
+                // Apply selected prices to inputs
+                const selectedPrices = presets[region][quality];
+                drywallCost.value = selectedPrices.drywall;
+                mudCost.value = selectedPrices.mud;
+                tapeCost.value = selectedPrices.tape;
+                screwsCost.value = selectedPrices.screws;
+                cornerbeadCost.value = selectedPrices.cornerbead;
+                primerCost.value = selectedPrices.primer;
+                laborRate.value = selectedPrices.labor;
+                
+                // Close the modal
+                presetModal.style.display = 'none';
+            }
+
+            // Blueprint saving and loading
+            function saveBlueprint() {
+                const blueprintData = {
+                    walls,
+                    doors,
+                    windows,
+                    rooms,
+                    zoomLevel,
+                    panOffset
+                };
+                
+                const dataStr = JSON.stringify(blueprintData);
+                
+                // Create a download link
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportName = 'drywall-blueprint-' + new Date().toISOString().slice(0,10) + '.json';
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportName);
+                linkElement.style.display = 'none';
+                
+                document.body.appendChild(linkElement);
+                linkElement.click();
+                document.body.removeChild(linkElement);
+            }
+
+            // Export estimate function
+            function printEstimate() {
+                if (!currentEstimate) {
+                    alert('Please calculate an estimate first.');
+                    return;
+                }
+                
+                // Create a printable version
+                const printWindow = window.open('', '_blank');
+                
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Drywall Estimate</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                line-height: 1.6;
+                                margin: 20px;
+                            }
+                            h1 {
+                                text-align: center;
+                                margin-bottom: 20px;
+                            }
+                            .estimate-header {
+                                margin-bottom: 20px;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 20px;
+                            }
+                            table th, table td {
+                                padding: 8px;
+                                text-align: left;
+                                border-bottom: 1px solid #ddd;
+                            }
+                            .total-row {
+                                font-weight: bold;
+                            }
+                            .footer {
+                                margin-top: 30px;
+                                font-size: 0.9em;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Drywall Estimate</h1>
+                        
+                        <div class="estimate-header">
+                            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        
+                        <h2>Project Areas</h2>
+                        <p><strong>Total Wall Area:</strong> ${Math.round(currentEstimate.wallArea)} sq ft</p>
+                        <p><strong>Total Ceiling Area:</strong> ${Math.round(currentEstimate.ceilingArea)} sq ft</p>
+                        <p><strong>Total Area:</strong> ${Math.round(currentEstimate.totalArea)} sq ft</p>
+                        
+                        <h2>Materials</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${currentEstimate.materials.map(item => `
+                                    <tr>
+                                        <td>${item.name}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${item.unit}</td>
+                                        <td>${item.total}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        
+                        <h2>Cost Summary</h2>
+                        <p><strong>Material Cost:</strong> $${currentEstimate.materialCost.toFixed(2)}</p>
+                        <p><strong>Labor Cost:</strong> $${currentEstimate.laborCost.toFixed(2)}</p>
+                        <p class="total-row"><strong>Total Estimated Cost:</strong> $${currentEstimate.totalCost.toFixed(2)}</p>
+                        
+                        <div class="footer">
+                            <p>This estimate was generated using Enhanced Drywall Estimator.</p>
+                            <p>Prices may vary based on location and market conditions. Actual costs may differ.</p>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                
+                printWindow.document.close();
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            }
+
+            // Save estimate as JSON
+            function saveEstimate() {
+                if (!currentEstimate) {
+                    alert('Please calculate an estimate first.');
+                    return;
+                }
+                
+                const estimateData = {
+                    date: new Date().toISOString(),
+                    rooms: rooms,
+                    blueprint: {
+                        walls: walls,
+                        doors: doors,
+                        windows: windows
+                    },
+                    materials: currentEstimate.materials,
+                    costs: {
+                        material: currentEstimate.materialCost,
+                        labor: currentEstimate.laborCost,
+                        total: currentEstimate.totalCost
+                    },
+                    areas: {
+                        wall: currentEstimate.wallArea,
+                        ceiling: currentEstimate.ceilingArea,
+                        total: currentEstimate.totalArea
+                    }
+                };
+                
+                const dataStr = JSON.stringify(estimateData);
+                
+                // Create a download link
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportName = 'drywall-estimate-' + new Date().toISOString().slice(0,10) + '.json';
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportName);
+                linkElement.style.display = 'none';
+                
+                document.body.appendChild(linkElement);
+                linkElement.click();
+                document.body.removeChild(linkElement);
+            }
+
+            // Tab switching functionality
+            function setupTabs() {
+                const tabs = document.querySelectorAll('.tab');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.dataset.tab;
+                        
+                        // Remove active class from all tabs and contents
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        
+                        // Add active class to selected tab and content
+                        tab.classList.add('active');
+                        document.getElementById(tabId).classList.add('active');
+                    });
+                });
+            }
+
+            // Analyze blueprint for rooms
+            function analyzeBlueprint() {
+                if (walls.length < 4) {
+                    alert('Please draw at least 4 walls to detect rooms.');
+                    return;
+                }
+                
+                const detectedRooms = detectRoom(walls);
+                
+                if (detectedRooms.length === 0) {
+                    alert('No rooms detected. Try drawing more completely enclosed spaces.');
+                    return;
+                }
+                
+                // Clear previous detected rooms
+                detectedRoomsContainer.innerHTML = '';
+                
+                detectedRooms.forEach(room => {
+                    // Create a unique ID for the detected room
+                    const roomId = `detected-room-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+                    room.id = roomId;
+                    
+                    // Add the room to the rooms array if not already there
+                    if (!rooms.some(r => r.id === roomId)) {
+                        rooms.push(room);
+                    }
+                    
+                    const roomElement = document.createElement('div');
+                    roomElement.className = 'room';
+                    roomElement.id = roomId;
+                    
+                    const areaInSqFt = (room.width * room.length).toFixed(1);
+                    
+                    roomElement.innerHTML = `
+                        <div class="room-header">
+                            <input type="text" class="room-name" value="${room.name}" data-room-id="${roomId}">
+                            <div>
+                                <button class="btn btn-sm btn-outline edit-room-btn" data-room-id="${roomId}">Edit</button>
+                                <button class="btn btn-sm btn-danger delete-room-btn" data-room-id="${roomId}">✕</button>
+                            </div>
+                        </div>
+                        <div class="room-grid">
+                            <div class="form-group">
+                                <label>Width (ft)</label>
+                                <input type="number" min="1" class="room-width" value="${room.width.toFixed(1)}" data-room-id="${roomId}">
+                            </div>
+                            <div class="form-group">
+                                <label>Length (ft)</label>
+                                <input type="number" min="1" class="room-length" value="${room.length.toFixed(1)}" data-room-id="${roomId}">
+                            </div>
+                            <div class="form-group">
+                                <label>Height (ft)</label>
+                                <input type="number" min="1" class="room-height" value="${room.height}" data-room-id="${roomId}">
+                            </div>
+                            <div class="form-group">
+                                <label>Area (sq ft)</label>
+                                <input type="text" disabled value="${areaInSqFt}">
+                            </div>
+                            <div class="form-group">
+                                <label>Type</label>
+                                <select class="room-type" data-room-id="${roomId}">
+                                    <option value="standard" selected>Standard</option>
+                                    <option value="bathroom">Bathroom</option>
+                                    <option value="kitchen">Kitchen</option>
+                                    <option value="garage">Garage</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="checkbox-label">
+                            <input type="checkbox" class="room-include-ceiling" checked data-room-id="${roomId}">
+                            <label>Include Ceiling</label>
+                        </div>
+                    `;
+                    
+                    detectedRoomsContainer.appendChild(roomElement);
+                    
+                    // Add event listeners
+                    roomElement.querySelector('.room-name').addEventListener('input', updateRoom);
+                    roomElement.querySelector('.room-width').addEventListener('change', updateRoom);
+                    roomElement.querySelector('.room-length').addEventListener('change', updateRoom);
+                    roomElement.querySelector('.room-height').addEventListener('change', updateRoom);
+                    roomElement.querySelector('.room-type').addEventListener('change', updateRoom);
+                    roomElement.querySelector('.room-include-ceiling').addEventListener('change', updateRoom);
+                    roomElement.querySelector('.delete-room-btn').addEventListener('click', deleteRoom);
+                    roomElement.querySelector('.edit-room-btn').addEventListener('click', editRoom);
+                });
+                
+                // Add room labels to blueprint
+                drawBlueprint();
+                
+                // Switch to the blueprint rooms tab
+                document.querySelector('.tab[data-tab="blueprint-rooms"]').click();
+            }
+
+            // Set up all event listeners
+            function initEventListeners() {
+                // Draw tool buttons
+                const drawTools = document.querySelectorAll('.draw-tool');
+                drawTools.forEach(tool => {
+                    tool.addEventListener('click', () => {
+                        // Remove active class from all tools
+                        drawTools.forEach(t => t.classList.remove('active'));
+                        
+                        // Add active class to selected tool
+                        tool.classList.add('active');
+                        
+                        // Set active tool
+                        activeTool = tool.dataset.tool;
+                        
+                        // Update cursor based on tool
+                                                // Update cursor based on tool
+                        if (activeTool === 'erase') {
+                            blueprintCanvas.style.cursor = 'not-allowed';
+                        } else {
+                            blueprintCanvas.style.cursor = 'crosshair';
+                        }
+                    });
+                });
+                
+                // Canvas event listeners
+                blueprintCanvas.addEventListener('mousedown', handleCanvasMouseDown);
+                blueprintCanvas.addEventListener('mousemove', handleCanvasMouseMove);
+                blueprintCanvas.addEventListener('mouseup', handleCanvasMouseUp);
+                window.addEventListener('mouseup', () => {
+                    isDrawing = false;
+                    isPanning = false;
+                    blueprintCanvas.style.cursor = 'crosshair';
+                });
+                
+                // Prevent context menu on right-click
+                blueprintCanvas.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                });
+                
+                // Button click handlers
+                addRoomBtn.addEventListener('click', addRoom);
+                calculateBtn.addEventListener('click', calculateEstimate);
+                analyzeBtn.addEventListener('click', analyzeBlueprint);
+                resetCanvasBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to reset the blueprint? This will delete all walls, doors and windows.')) {
+                        walls = [];
+                        doors = [];
+                        windows = [];
+                        drawBlueprint();
+                    }
+                });
+                
+                saveEstimateBtn.addEventListener('click', saveEstimate);
+                printEstimateBtn.addEventListener('click', printEstimate);
+                presetPricingBtn.addEventListener('click', loadPricePresets);
+                saveBlueprintBtn.addEventListener('click', saveBlueprint);
+                
+                // Zoom buttons
+                zoomInBtn.addEventListener('click', () => {
+                    zoomLevel *= 1.2;
+                    drawGrid();
+                    drawBlueprint();
+                });
+                
+                zoomOutBtn.addEventListener('click', () => {
+                    zoomLevel /= 1.2;
+                    if (zoomLevel < 0.3) zoomLevel = 0.3; // Limit minimum zoom
+                    drawGrid();
+                    drawBlueprint();
+                });
+                
+                // Mouse wheel for zooming
+                blueprintContainer.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    
+                    // Get mouse position before zoom
+                    const pos = getMousePosition(e);
+                    
+                    // Calculate position relative to pan offset
+                    const relX = pos.x - panOffset.x;
+                    const relY = pos.y - panOffset.y;
+                    
+                    // Adjust zoom level
+                    if (e.deltaY < 0) {
+                        // Zoom in
+                        zoomLevel *= 1.1;
+                    } else {
+                        // Zoom out
+                        zoomLevel /= 1.1;
+                        if (zoomLevel < 0.3) zoomLevel = 0.3; // Limit minimum zoom
+                    }
+                    
+                    // Adjust pan to keep the point under the mouse fixed
+                    panOffset.x = pos.x - relX * (zoomLevel / (e.deltaY < 0 ? 1.1 : 1/1.1));
+                    panOffset.y = pos.y - relY * (zoomLevel / (e.deltaY < 0 ? 1.1 : 1/1.1));
+                    
+                    drawGrid();
+                    drawBlueprint();
+                });
+                
+                // Modal events
+                closeModalButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const modal = e.target.closest('.modal');
+                        modal.style.display = 'none';
+                    });
+                });
+                
+                // Close modal when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        e.target.style.display = 'none';
+                    }
+                });
+                
+                applyPresetBtn.addEventListener('click', applyPresets);
+                saveRoomDetailsBtn.addEventListener('click', saveRoomDetails);
+                
+                // Tab switching
+                setupTabs();
+            }
+
+            // Initialize the app
+            function init() {
+                // Add an initial room
+                addRoom();
+                
+                // Set up all event listeners
+                initEventListeners();
+                
+                // Initialize canvas
+                initCanvas();
+            }
+
+            // Start the app
+            init();
+        });
+    </script>
+</body>
+</html>
+
