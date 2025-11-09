@@ -8,222 +8,194 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="main-header">
-            <div class="header-content">
-                <h1>
-                    <span class="icon">📐</span>
-                    Professional Drywall Estimator
-                </h1>
-                <p class="header-subtitle">Advanced Blueprint Designer with Multi-Floor Support</p>
+        <!-- Compact Header -->
+        <header class="main-header compact">
+            <div class="header-brand">
+                <span class="brand-icon">📐</span>
+                <div class="brand-text">
+                    <h1>Professional Drywall Estimator</h1>
+                    <p class="tagline">Advanced Blueprint Designer</p>
+                </div>
             </div>
             <div class="header-actions">
-                <button id="new-project-btn" class="btn btn-outline btn-sm">
-                    <span class="icon">📄</span> New Project
+                <button id="new-project-btn" class="btn-icon" title="New Project">
+                    <span>📄</span>
                 </button>
-                <button id="load-project-btn" class="btn btn-outline btn-sm">
-                    <span class="icon">📂</span> Load Project
+                <button id="load-project-btn" class="btn-icon" title="Load Project">
+                    <span>📂</span>
                 </button>
-                <button id="save-project-btn" class="btn btn-primary btn-sm">
-                    <span class="icon">💾</span> Save Project
+                <button id="save-project-btn" class="btn-icon btn-primary" title="Save Project">
+                    <span>💾</span>
                 </button>
-                <button id="help-btn" class="btn btn-outline btn-sm">
-                    <span class="icon">❓</span> Help
+                <button id="help-btn" class="btn-icon" title="Help">
+                    <span>❓</span>
                 </button>
             </div>
         </header>
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Left Sidebar - Tools & Layers -->
-            <aside class="sidebar sidebar-left">
-                <div class="sidebar-section">
-                    <h3>Drawing Tools</h3>
-                    <div class="tool-grid">
-                        <button class="tool-btn active" data-tool="select" title="Select/Move (V)">
-                            <span class="icon">↖</span>
-                            <span class="tool-label">Select</span>
-                            <span class="tool-shortcut">V</span>
-                        </button>
-                        <button class="tool-btn" data-tool="wall-exterior" title="Exterior Wall (W)">
-                            <span class="icon">━</span>
-                            <span class="tool-label">Ext Wall</span>
-                            <span class="tool-shortcut">W</span>
-                        </button>
-                        <button class="tool-btn" data-tool="wall-interior" title="Interior Wall (I)">
-                            <span class="icon">─</span>
-                            <span class="tool-label">Int Wall</span>
-                            <span class="tool-shortcut">I</span>
-                        </button>
-                        <button class="tool-btn" data-tool="wall-partition" title="Partition Wall (P)">
-                            <span class="icon">┄</span>
-                            <span class="tool-label">Partition</span>
-                            <span class="tool-shortcut">P</span>
-                        </button>
-                        <button class="tool-btn" data-tool="door-interior" title="Interior Door (D)">
-                            <span class="icon">🚪</span>
-                            <span class="tool-label">Int Door</span>
-                            <span class="tool-shortcut">D</span>
-                        </button>
-                        <button class="tool-btn" data-tool="door-exterior" title="Exterior Door (E)">
-                            <span class="icon">🚪</span>
-                            <span class="tool-label">Ext Door</span>
-                            <span class="tool-shortcut">E</span>
-                        </button>
-                        <button class="tool-btn" data-tool="window-standard" title="Standard Window (N)">
-                            <span class="icon">▯</span>
-                            <span class="tool-label">Window</span>
-                            <span class="tool-shortcut">N</span>
-                        </button>
-                        <button class="tool-btn" data-tool="window-large" title="Large Window">
-                            <span class="icon">▭</span>
-                            <span class="tool-label">Lg Window</span>
-                        </button>
-                        <button class="tool-btn" data-tool="stairs-up" title="Stairs Up (U)">
-                            <span class="icon">⬆</span>
-                            <span class="tool-label">Stairs Up</span>
-                            <span class="tool-shortcut">U</span>
-                        </button>
-                        <button class="tool-btn" data-tool="stairs-down" title="Stairs Down">
-                            <span class="icon">⬇</span>
-                            <span class="tool-label">Stairs Dn</span>
-                        </button>
-                        <button class="tool-btn" data-tool="room-auto" title="Auto Detect Room (R)">
-                            <span class="icon">□</span>
-                            <span class="tool-label">Auto Room</span>
-                            <span class="tool-shortcut">R</span>
-                        </button>
-                        <button class="tool-btn" data-tool="measure" title="Measure Distance (M)">
-                            <span class="icon">📏</span>
-                            <span class="tool-label">Measure</span>
-                            <span class="tool-shortcut">M</span>
-                        </button>
-                        <button class="tool-btn" data-tool="text" title="Add Text Label (T)">
-                            <span class="icon">T</span>
-                            <span class="tool-label">Text</span>
-                            <span class="tool-shortcut">T</span>
-                        </button>
-                        <button class="tool-btn" data-tool="erase" title="Erase (Delete)">
-                            <span class="icon">⌫</span>
-                            <span class="tool-label">Erase</span>
-                            <span class="tool-shortcut">Del</span>
-                        </button>
-                    </div>
-                </div>
+            <!-- Collapsible Left Sidebar -->
+            <aside class="sidebar sidebar-left collapsible" id="left-sidebar">
+                <button class="sidebar-toggle" id="left-toggle" title="Toggle Tools Panel">
+                    <span class="toggle-icon">◀</span>
+                </button>
 
-                <div class="sidebar-section">
-                    <h3>View Controls</h3>
-                    <div class="control-group">
-                        <button id="zoom-in-btn" class="btn btn-sm btn-block" title="Zoom In (+)">
-                            <span class="icon">+</span> Zoom In
-                        </button>
-                        <button id="zoom-out-btn" class="btn btn-sm btn-block" title="Zoom Out (-)">
-                            <span class="icon">-</span> Zoom Out
-                        </button>
-                        <button id="zoom-fit-btn" class="btn btn-sm btn-block" title="Fit to Screen (0)">
-                            <span class="icon">⊡</span> Fit View
-                        </button>
-                        <button id="zoom-reset-btn" class="btn btn-sm btn-block" title="Reset Zoom">
-                            <span class="icon">↺</span> Reset Zoom
-                        </button>
+                <div class="sidebar-content">
+                    <!-- Drawing Tools - Compact Grid -->
+                    <div class="panel">
+                        <div class="panel-header collapsible-header" data-panel="tools">
+                            <h3>🛠️ Drawing Tools</h3>
+                            <span class="expand-icon">−</span>
+                        </div>
+                        <div class="panel-content" id="tools-panel">
+                            <div class="tool-grid compact">
+                                <button class="tool-btn active compact" data-tool="select" title="Select/Move (V)">
+                                    <span class="icon">↖</span>
+                                    <span class="label">Select</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="wall-exterior" title="Exterior Wall (W)">
+                                    <span class="icon">━</span>
+                                    <span class="label">Ext</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="wall-interior" title="Interior Wall (I)">
+                                    <span class="icon">─</span>
+                                    <span class="label">Int</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="wall-partition" title="Partition (P)">
+                                    <span class="icon">┄</span>
+                                    <span class="label">Part</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="door-interior" title="Interior Door (D)">
+                                    <span class="icon">🚪</span>
+                                    <span class="label">Door</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="door-exterior" title="Exterior Door (E)">
+                                    <span class="icon">🚪</span>
+                                    <span class="label">Ext D</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="window-standard" title="Window (N)">
+                                    <span class="icon">▯</span>
+                                    <span class="label">Win</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="window-large" title="Large Window">
+                                    <span class="icon">▭</span>
+                                    <span class="label">Lg Win</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="stairs-up" title="Stairs Up (U)">
+                                    <span class="icon">⬆</span>
+                                    <span class="label">Up</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="stairs-down" title="Stairs Down">
+                                    <span class="icon">⬇</span>
+                                    <span class="label">Down</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="room-auto" title="Auto Room (R)">
+                                    <span class="icon">□</span>
+                                    <span class="label">Room</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="measure" title="Measure (M)">
+                                    <span class="icon">📏</span>
+                                    <span class="label">Msre</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="text" title="Text (T)">
+                                    <span class="icon">T</span>
+                                    <span class="label">Text</span>
+                                </button>
+                                <button class="tool-btn compact" data-tool="erase" title="Erase (Del)">
+                                    <span class="icon">⌫</span>
+                                    <span class="label">Erase</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="control-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="show-grid" checked>
-                            <span>Show Grid</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="show-dimensions" checked>
-                            <span>Show Dimensions</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="snap-to-grid" checked>
-                            <span>Snap to Grid</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="show-room-labels" checked>
-                            <span>Show Room Labels</span>
-                        </label>
-                    </div>
-                </div>
 
-                <div class="sidebar-section">
-                    <h3>Floors</h3>
-                    <div id="floor-list" class="floor-list">
-                        <!-- Floors will be added here -->
+                    <!-- View Controls -->
+                    <div class="panel">
+                        <div class="panel-header collapsible-header" data-panel="view">
+                            <h3>👁️ View</h3>
+                            <span class="expand-icon">−</span>
+                        </div>
+                        <div class="panel-content" id="view-panel">
+                            <div class="btn-group-compact">
+                                <button id="zoom-in-btn" class="btn-compact" title="Zoom In (+)">+</button>
+                                <button id="zoom-out-btn" class="btn-compact" title="Zoom Out (-)">−</button>
+                                <button id="zoom-fit-btn" class="btn-compact" title="Fit (0)">⊡</button>
+                                <button id="zoom-reset-btn" class="btn-compact" title="Reset">↺</button>
+                            </div>
+                            <div class="options-compact">
+                                <label><input type="checkbox" id="show-grid" checked><span>Grid</span></label>
+                                <label><input type="checkbox" id="show-dimensions" checked><span>Dims</span></label>
+                                <label><input type="checkbox" id="snap-to-grid" checked><span>Snap</span></label>
+                                <label><input type="checkbox" id="show-room-labels" checked><span>Labels</span></label>
+                            </div>
+                        </div>
                     </div>
-                    <button id="add-floor-btn" class="btn btn-sm btn-block btn-outline">
-                        <span class="icon">+</span> Add Floor
-                    </button>
-                </div>
 
-                <div class="sidebar-section">
-                    <h3>Layers</h3>
-                    <div class="layer-controls">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="layer-walls" checked>
-                            <span class="layer-indicator wall-color"></span>
-                            <span>Walls</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="layer-doors" checked>
-                            <span class="layer-indicator door-color"></span>
-                            <span>Doors</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="layer-windows" checked>
-                            <span class="layer-indicator window-color"></span>
-                            <span>Windows</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="layer-stairs" checked>
-                            <span class="layer-indicator stairs-color"></span>
-                            <span>Stairs</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="layer-rooms" checked>
-                            <span class="layer-indicator room-color"></span>
-                            <span>Rooms</span>
-                        </label>
+                    <!-- Floors -->
+                    <div class="panel">
+                        <div class="panel-header collapsible-header" data-panel="floors">
+                            <h3>🏢 Floors</h3>
+                            <span class="expand-icon">−</span>
+                        </div>
+                        <div class="panel-content" id="floors-panel">
+                            <div id="floor-list" class="floor-list compact"></div>
+                            <button id="add-floor-btn" class="btn-compact btn-block">+ Add Floor</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="sidebar-section">
-                    <h3>Quick Actions</h3>
-                    <button id="undo-btn" class="btn btn-sm btn-block" title="Undo (Ctrl+Z)" disabled>
-                        <span class="icon">↶</span> Undo
-                    </button>
-                    <button id="redo-btn" class="btn btn-sm btn-block" title="Redo (Ctrl+Y)" disabled>
-                        <span class="icon">↷</span> Redo
-                    </button>
-                    <button id="clear-all-btn" class="btn btn-sm btn-block btn-outline">
-                        <span class="icon">🗑️</span> Clear All
-                    </button>
+                    <!-- Layers -->
+                    <div class="panel">
+                        <div class="panel-header collapsible-header" data-panel="layers">
+                            <h3>🎨 Layers</h3>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="panel-content collapsed" id="layers-panel">
+                            <div class="options-compact">
+                                <label><input type="checkbox" id="layer-walls" checked><span class="layer-dot wall"></span><span>Walls</span></label>
+                                <label><input type="checkbox" id="layer-doors" checked><span class="layer-dot door"></span><span>Doors</span></label>
+                                <label><input type="checkbox" id="layer-windows" checked><span class="layer-dot window"></span><span>Windows</span></label>
+                                <label><input type="checkbox" id="layer-stairs" checked><span class="layer-dot stairs"></span><span>Stairs</span></label>
+                                <label><input type="checkbox" id="layer-rooms" checked><span class="layer-dot room"></span><span>Rooms</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="panel">
+                        <div class="panel-header collapsible-header" data-panel="actions">
+                            <h3>⚡ Actions</h3>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="panel-content collapsed" id="actions-panel">
+                            <button id="undo-btn" class="btn-compact btn-block" disabled>↶ Undo</button>
+                            <button id="redo-btn" class="btn-compact btn-block" disabled>↷ Redo</button>
+                            <button id="clear-all-btn" class="btn-compact btn-block btn-danger">🗑️ Clear</button>
+                        </div>
+                    </div>
                 </div>
             </aside>
 
-            <!-- Center - Canvas Area -->
+            <!-- Canvas Area -->
             <main class="canvas-area">
-                <div class="canvas-header">
-                    <div class="canvas-info">
-                        <span id="current-floor-label">Floor 1</span>
-                        <span class="separator">•</span>
-                        <span id="scale-label">Scale: 1" = 1'</span>
-                        <span class="separator">•</span>
-                        <span id="zoom-label">Zoom: 100%</span>
-                        <span class="separator">•</span>
-                        <span id="cursor-position">X: 0', Y: 0'</span>
+                <!-- Floating Toolbar -->
+                <div class="floating-toolbar">
+                    <div class="toolbar-section">
+                        <span id="current-floor-label" class="info-badge">Floor 1</span>
+                        <span id="scale-label" class="info-badge">1"=1'</span>
+                        <span id="zoom-label" class="info-badge">100%</span>
                     </div>
-                    <div class="canvas-actions">
-                        <button id="export-image-btn" class="btn btn-sm btn-outline">
-                            <span class="icon">🖼️</span> Export Image
-                        </button>
-                        <button id="export-pdf-btn" class="btn btn-sm btn-outline">
-                            <span class="icon">📄</span> Export PDF
-                        </button>
+                    <div class="toolbar-section">
+                        <span id="cursor-position" class="info-badge">X: 0', Y: 0'</span>
+                        <span id="element-count" class="info-badge">0 elements</span>
+                    </div>
+                    <div class="toolbar-section">
+                        <button id="export-image-btn" class="btn-compact" title="Export Image">🖼️</button>
+                        <button id="export-pdf-btn" class="btn-compact" title="Export PDF">📄</button>
                     </div>
                 </div>
 
+                <!-- Canvas -->
                 <div id="blueprint-container" class="blueprint-container">
                     <canvas id="grid-canvas"></canvas>
                     <canvas id="blueprint-canvas"></canvas>
@@ -231,234 +203,245 @@
                     <div id="canvas-tooltip" class="canvas-tooltip"></div>
                 </div>
 
-                <div class="canvas-footer">
-                    <div class="status-bar">
-                        <span id="status-message">Ready</span>
-                        <span class="separator">•</span>
-                        <span id="element-count">0 elements</span>
-                    </div>
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span id="status-message">Ready</span>
                 </div>
             </main>
 
-            <!-- Right Sidebar - Properties & Calculations -->
-            <aside class="sidebar sidebar-right">
-                <div class="sidebar-tabs">
-                    <button class="tab-btn active" data-tab="properties">Properties</button>
-                    <button class="tab-btn" data-tab="rooms">Rooms</button>
-                    <button class="tab-btn" data-tab="materials">Materials</button>
-                    <button class="tab-btn" data-tab="estimate">Estimate</button>
-                    <button class="tab-btn" data-tab="recommendations">Tips</button>
-                </div>
+            <!-- Collapsible Right Sidebar -->
+            <aside class="sidebar sidebar-right collapsible" id="right-sidebar">
+                <button class="sidebar-toggle" id="right-toggle" title="Toggle Properties Panel">
+                    <span class="toggle-icon">▶</span>
+                </button>
 
-                <!-- Properties Tab -->
-                <div id="properties-tab" class="tab-content active">
-                    <div class="sidebar-section">
-                        <h3>Selection Properties</h3>
-                        <div id="properties-content" class="properties-content">
-                            <p class="no-selection">Select an element to view properties</p>
+                <div class="sidebar-content">
+                    <!-- Compact Tabs -->
+                    <div class="tabs-compact">
+                        <button class="tab-btn compact active" data-tab="rooms" title="Rooms">🏠</button>
+                        <button class="tab-btn compact" data-tab="materials" title="Materials">💰</button>
+                        <button class="tab-btn compact" data-tab="estimate" title="Estimate">🧮</button>
+                        <button class="tab-btn compact" data-tab="recommendations" title="Tips">💡</button>
+                    </div>
+
+                    <!-- Rooms Tab -->
+                    <div id="rooms-tab" class="tab-content active">
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Rooms</h3>
+                                <button id="add-room-manual-btn" class="btn-icon-sm">+</button>
+                            </div>
+                            <div id="rooms-list" class="rooms-list compact scrollable"></div>
+                            <button id="detect-rooms-btn" class="btn-compact btn-block">🔍 Auto-Detect</button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Rooms Tab -->
-                <div id="rooms-tab" class="tab-content">
-                    <div class="sidebar-section">
-                        <div class="section-header">
-                            <h3>Rooms</h3>
-                            <button id="add-room-manual-btn" class="btn btn-sm btn-outline">
-                                <span class="icon">+</span> Add
-                            </button>
-                        </div>
-                        <div id="rooms-list" class="rooms-list">
-                            <!-- Rooms will be listed here -->
-                        </div>
-                        <button id="detect-rooms-btn" class="btn btn-block">
-                            <span class="icon">🔍</span> Auto-Detect Rooms
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Materials Tab -->
-                <div id="materials-tab" class="tab-content">
-                    <div class="sidebar-section">
-                        <h3>Material Pricing</h3>
-                        <div class="form-group">
-                            <label>Price Preset</label>
-                            <select id="price-preset-select">
-                                <option value="custom">Custom Prices</option>
-                                <option value="national-standard">National Average - Standard</option>
-                                <option value="national-premium">National Average - Premium</option>
-                                <option value="national-economy">National Average - Economy</option>
-                                <option value="northeast-standard">Northeast - Standard</option>
-                                <option value="southeast-standard">Southeast - Standard</option>
-                                <option value="midwest-standard">Midwest - Standard</option>
-                                <option value="southwest-standard">Southwest - Standard</option>
-                                <option value="west-standard">West Coast - Standard</option>
-                            </select>
-                        </div>
-
-                        <h4>Drywall</h4>
-                        <div class="form-group">
-                            <label>1/2" Standard ($/sheet)</label>
-                            <input type="number" id="price-drywall-standard" value="15.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>5/8" Fire-Rated ($/sheet)</label>
-                            <input type="number" id="price-drywall-firerated" value="18.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>1/2" Moisture-Resistant ($/sheet)</label>
-                            <input type="number" id="price-drywall-moisture" value="22.50" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>5/8" Type X ($/sheet)</label>
-                            <input type="number" id="price-drywall-typex" value="20.00" step="0.01" min="0">
-                        </div>
-
-                        <h4>Finishing Materials</h4>
-                        <div class="form-group">
-                            <label>Joint Compound ($/bucket)</label>
-                            <input type="number" id="price-mud" value="20.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Paper Tape ($/roll)</label>
-                            <input type="number" id="price-tape-paper" value="8.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Mesh Tape ($/roll)</label>
-                            <input type="number" id="price-tape-mesh" value="12.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Screws ($/lb)</label>
-                            <input type="number" id="price-screws" value="8.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Metal Corner Bead ($/10ft)</label>
-                            <input type="number" id="price-cornerbead-metal" value="5.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Bullnose Corner Bead ($/10ft)</label>
-                            <input type="number" id="price-cornerbead-bullnose" value="7.50" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Primer/Sealer ($/gallon)</label>
-                            <input type="number" id="price-primer" value="35.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Texture Material ($/bag)</label>
-                            <input type="number" id="price-texture" value="15.00" step="0.01" min="0">
-                        </div>
-
-                        <h4>Labor Rates</h4>
-                        <div class="form-group">
-                            <label>Hanging ($/sq ft)</label>
-                            <input type="number" id="labor-hanging" value="0.80" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Taping ($/sq ft)</label>
-                            <input type="number" id="labor-taping" value="0.90" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Finishing ($/sq ft)</label>
-                            <input type="number" id="labor-finishing" value="0.80" step="0.01" min="0">
-                        </div>
-
-                        <h4>Project Settings</h4>
-                        <div class="form-group">
-                            <label>Waste Factor (%)</label>
-                            <input type="number" id="waste-factor" value="10" step="1" min="0" max="50">
-                        </div>
-                        <div class="form-group">
-                            <label>Markup (%)</label>
-                            <input type="number" id="markup-percent" value="20" step="1" min="0">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Estimate Tab -->
-                <div id="estimate-tab" class="tab-content">
-                    <div class="sidebar-section">
-                        <div class="section-header">
-                            <h3>Estimate Summary</h3>
-                            <button id="calculate-estimate-btn" class="btn btn-sm btn-success">
-                                <span class="icon">🧮</span> Calculate
-                            </button>
-                        </div>
-
-                        <div id="estimate-results" class="estimate-results">
-                            <div class="estimate-card">
-                                <h4>Areas</h4>
-                                <div class="stat-row">
-                                    <span>Total Wall Area:</span>
-                                    <strong id="est-wall-area">0 sq ft</strong>
-                                </div>
-                                <div class="stat-row">
-                                    <span>Total Ceiling Area:</span>
-                                    <strong id="est-ceiling-area">0 sq ft</strong>
-                                </div>
-                                <div class="stat-row">
-                                    <span>Stairwell Area:</span>
-                                    <strong id="est-stair-area">0 sq ft</strong>
-                                </div>
-                                <div class="stat-row highlight">
-                                    <span>Total Coverage:</span>
-                                    <strong id="est-total-area">0 sq ft</strong>
+                    <!-- Materials Tab -->
+                    <div id="materials-tab" class="tab-content">
+                        <div class="panel scrollable">
+                            <div class="panel-header collapsible-header" data-panel="pricing">
+                                <h3>💰 Pricing</h3>
+                                <span class="expand-icon">−</span>
+                            </div>
+                            <div class="panel-content" id="pricing-panel">
+                                <div class="form-group-compact">
+                                    <label>Preset</label>
+                                    <select id="price-preset-select" class="input-compact">
+                                        <option value="custom">Custom</option>
+                                        <option value="national-standard">National Avg</option>
+                                        <option value="national-premium">Premium</option>
+                                        <option value="national-economy">Economy</option>
+                                        <option value="northeast-standard">Northeast</option>
+                                        <option value="southeast-standard">Southeast</option>
+                                        <option value="midwest-standard">Midwest</option>
+                                        <option value="southwest-standard">Southwest</option>
+                                        <option value="west-standard">West Coast</option>
+                                    </select>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="estimate-card">
-                                <h4>Materials</h4>
-                                <div id="materials-breakdown">
-                                    <!-- Materials list will be populated here -->
+                        <div class="panel scrollable">
+                            <div class="panel-header collapsible-header" data-panel="drywall-prices">
+                                <h3>Drywall</h3>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="panel-content collapsed" id="drywall-prices-panel">
+                                <div class="form-group-compact">
+                                    <label>1/2" Standard</label>
+                                    <input type="number" id="price-drywall-standard" value="15.00" step="0.01" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>5/8" Fire-Rated</label>
+                                    <input type="number" id="price-drywall-firerated" value="18.00" step="0.01" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>Moisture-Resistant</label>
+                                    <input type="number" id="price-drywall-moisture" value="22.50" step="0.01" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>Type X</label>
+                                    <input type="number" id="price-drywall-typex" value="20.00" step="0.01" class="input-compact">
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="estimate-card">
-                                <h4>Cost Breakdown</h4>
-                                <div class="stat-row">
-                                    <span>Materials:</span>
-                                    <strong id="est-materials-cost">$0.00</strong>
+                        <div class="panel scrollable">
+                            <div class="panel-header collapsible-header" data-panel="finish-prices">
+                                <h3>Finishing</h3>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="panel-content collapsed" id="finish-prices-panel">
+                                <div class="form-group-compact">
+                                    <label>Joint Compound</label>
+                                    <input type="number" id="price-mud" value="20.00" step="0.01" class="input-compact">
                                 </div>
-                                <div class="stat-row">
-                                    <span>Labor:</span>
-                                    <strong id="est-labor-cost">$0.00</strong>
+                                <div class="form-group-compact">
+                                    <label>Paper Tape</label>
+                                    <input type="number" id="price-tape-paper" value="8.00" step="0.01" class="input-compact">
                                 </div>
-                                <div class="stat-row">
-                                    <span>Subtotal:</span>
-                                    <strong id="est-subtotal">$0.00</strong>
+                                <div class="form-group-compact">
+                                    <label>Mesh Tape</label>
+                                    <input type="number" id="price-tape-mesh" value="12.00" step="0.01" class="input-compact">
                                 </div>
-                                <div class="stat-row">
-                                    <span>Markup (20%):</span>
-                                    <strong id="est-markup">$0.00</strong>
+                                <div class="form-group-compact">
+                                    <label>Screws ($/lb)</label>
+                                    <input type="number" id="price-screws" value="8.00" step="0.01" class="input-compact">
                                 </div>
-                                <div class="stat-row highlight total-row">
-                                    <span>Total Estimate:</span>
-                                    <strong id="est-total" class="total-amount">$0.00</strong>
+                                <div class="form-group-compact">
+                                    <label>Corner Bead</label>
+                                    <input type="number" id="price-cornerbead-metal" value="5.00" step="0.01" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>Bullnose Bead</label>
+                                    <input type="number" id="price-cornerbead-bullnose" value="7.50" step="0.01" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>Primer</label>
+                                    <input type="number" id="price-primer" value="35.00" step="0.01" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>Texture</label>
+                                    <input type="number" id="price-texture" value="15.00" step="0.01" class="input-compact">
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="estimate-actions">
-                                <button id="export-estimate-btn" class="btn btn-block">
-                                    <span class="icon">💾</span> Export Estimate
-                                </button>
-                                <button id="print-estimate-btn" class="btn btn-block btn-outline">
-                                    <span class="icon">🖨️</span> Print Estimate
-                                </button>
+                        <div class="panel scrollable">
+                            <div class="panel-header collapsible-header" data-panel="labor-rates">
+                                <h3>Labor</h3>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="panel-content collapsed" id="labor-rates-panel">
+                                <div class="form-group-compact">
+                                    <label>Hanging ($/sq ft)</label>
+                                    <input type="number" id="labor-hanging" value="0.80" step="0.01" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>Taping ($/sq ft)</label>
+                                    <input type="number" id="labor-taping" value="0.90" step="0.01" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>Finishing ($/sq ft)</label>
+                                    <input type="number" id="labor-finishing" value="0.80" step="0.01" class="input-compact">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel scrollable">
+                            <div class="panel-header collapsible-header" data-panel="project-settings">
+                                <h3>Settings</h3>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="panel-content collapsed" id="project-settings-panel">
+                                <div class="form-group-compact">
+                                    <label>Waste Factor (%)</label>
+                                    <input type="number" id="waste-factor" value="10" step="1" class="input-compact">
+                                </div>
+                                <div class="form-group-compact">
+                                    <label>Markup (%)</label>
+                                    <input type="number" id="markup-percent" value="20" step="1" class="input-compact">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Recommendations Tab -->
-                <div id="recommendations-tab" class="tab-content">
-                    <div class="sidebar-section">
-                        <h3>Smart Recommendations</h3>
-                        <div id="recommendations-list" class="recommendations-list">
-                            <div class="recommendation-card info">
-                                <div class="recommendation-icon">💡</div>
-                                <div class="recommendation-content">
-                                    <strong>Welcome!</strong>
-                                    <p>Start by drawing your floor plan. Recommendations will appear as you work.</p>
+                    <!-- Estimate Tab -->
+                    <div id="estimate-tab" class="tab-content">
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Estimate</h3>
+                                <button id="calculate-estimate-btn" class="btn-icon-sm btn-success">🧮</button>
+                            </div>
+
+                            <div class="estimate-results scrollable">
+                                <div class="stat-card compact">
+                                    <div class="stat-label">Wall Area</div>
+                                    <div class="stat-value" id="est-wall-area">0 sq ft</div>
+                                </div>
+                                <div class="stat-card compact">
+                                    <div class="stat-label">Ceiling Area</div>
+                                    <div class="stat-value" id="est-ceiling-area">0 sq ft</div>
+                                </div>
+                                <div class="stat-card compact">
+                                    <div class="stat-label">Stairwell</div>
+                                    <div class="stat-value" id="est-stair-area">0 sq ft</div>
+                                </div>
+                                <div class="stat-card compact highlight">
+                                    <div class="stat-label">Total</div>
+                                    <div class="stat-value" id="est-total-area">0 sq ft</div>
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="panel-header collapsible-header" data-panel="materials-breakdown">
+                                    <h4>Materials</h4>
+                                    <span class="expand-icon">−</span>
+                                </div>
+                                <div class="panel-content" id="materials-breakdown-panel">
+                                    <div id="materials-breakdown"></div>
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="stat-card compact">
+                                    <div class="stat-label">Materials</div>
+                                    <div class="stat-value" id="est-materials-cost">$0</div>
+                                </div>
+                                <div class="stat-card compact">
+                                    <div class="stat-label">Labor</div>
+                                    <div class="stat-value" id="est-labor-cost">$0</div>
+                                </div>
+                                <div class="stat-card compact">
+                                    <div class="stat-label">Markup</div>
+                                    <div class="stat-value" id="est-markup">$0</div>
+                                </div>
+                                <div class="stat-card compact total">
+                                    <div class="stat-label">Total</div>
+                                    <div class="stat-value" id="est-total">$0</div>
+                                </div>
+
+                                <div class="btn-group-vertical">
+                                    <button id="export-estimate-btn" class="btn-compact btn-block">💾 Export</button>
+                                    <button id="print-estimate-btn" class="btn-compact btn-block">🖨️ Print</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations Tab -->
+                    <div id="recommendations-tab" class="tab-content">
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Smart Tips</h3>
+                            </div>
+                            <div id="recommendations-list" class="recommendations-list scrollable">
+                                <div class="tip-card info">
+                                    <span class="tip-icon">💡</span>
+                                    <div class="tip-content">
+                                        <strong>Welcome!</strong>
+                                        <p>Start drawing. Tips appear as you work.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -469,23 +452,21 @@
     </div>
 
     <!-- Modals -->
-
-    <!-- Room Properties Modal -->
     <div id="room-modal" class="modal">
-        <div class="modal-content modal-large">
+        <div class="modal-content modal-compact">
             <div class="modal-header">
-                <h2 id="room-modal-title">Room Properties</h2>
+                <h2>Room Properties</h2>
                 <button class="modal-close">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Room Name</label>
-                        <input type="text" id="room-name" placeholder="e.g., Living Room">
+            <div class="modal-body scrollable">
+                <div class="form-grid-compact">
+                    <div class="form-group-compact">
+                        <label>Name</label>
+                        <input type="text" id="room-name" placeholder="Living Room" class="input-compact">
                     </div>
-                    <div class="form-group">
-                        <label>Room Type</label>
-                        <select id="room-type">
+                    <div class="form-group-compact">
+                        <label>Type</label>
+                        <select id="room-type" class="input-compact">
                             <option value="living">Living Room</option>
                             <option value="bedroom">Bedroom</option>
                             <option value="kitchen">Kitchen</option>
@@ -495,197 +476,126 @@
                             <option value="garage">Garage</option>
                             <option value="basement">Basement</option>
                             <option value="hallway">Hallway</option>
-                            <option value="utility">Utility Room</option>
-                            <option value="laundry">Laundry Room</option>
-                            <option value="closet">Closet</option>
+                            <option value="utility">Utility</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Width (feet)</label>
-                        <input type="number" id="room-width" value="12" step="0.5" min="0">
+                    <div class="form-group-compact">
+                        <label>Width (ft)</label>
+                        <input type="number" id="room-width" value="12" step="0.5" class="input-compact">
                     </div>
-                    <div class="form-group">
-                        <label>Length (feet)</label>
-                        <input type="number" id="room-length" value="15" step="0.5" min="0">
+                    <div class="form-group-compact">
+                        <label>Length (ft)</label>
+                        <input type="number" id="room-length" value="15" step="0.5" class="input-compact">
                     </div>
-                    <div class="form-group">
-                        <label>Ceiling Height (feet)</label>
-                        <input type="number" id="room-height" value="8" step="0.5" min="0">
+                    <div class="form-group-compact">
+                        <label>Height (ft)</label>
+                        <input type="number" id="room-height" value="8" step="0.5" class="input-compact">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group-compact">
                         <label>Ceiling Type</label>
-                        <select id="room-ceiling-type">
+                        <select id="room-ceiling-type" class="input-compact">
                             <option value="standard">Standard Flat</option>
                             <option value="vaulted">Vaulted</option>
-                            <option value="tray">Tray Ceiling</option>
+                            <option value="tray">Tray</option>
                             <option value="coffered">Coffered</option>
-                            <option value="none">No Ceiling (Open)</option>
+                            <option value="none">No Ceiling</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group-compact">
                         <label>Drywall Type</label>
-                        <select id="room-drywall-type">
-                            <option value="standard">1/2" Standard</option>
-                            <option value="moisture">1/2" Moisture-Resistant</option>
-                            <option value="firerated">5/8" Fire-Rated</option>
-                            <option value="typex">5/8" Type X</option>
+                        <select id="room-drywall-type" class="input-compact">
+                            <option value="standard">Standard</option>
+                            <option value="moisture">Moisture-Resistant</option>
+                            <option value="firerated">Fire-Rated</option>
+                            <option value="typex">Type X</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group-compact">
                         <label>Finish Level</label>
-                        <select id="room-finish-level">
-                            <option value="level0">Level 0 - No finish</option>
-                            <option value="level1">Level 1 - Tape only</option>
-                            <option value="level2">Level 2 - Tape + 1 coat</option>
-                            <option value="level3">Level 3 - Tape + 2 coats</option>
-                            <option value="level4" selected>Level 4 - Smooth finish</option>
-                            <option value="level5">Level 5 - Glass smooth</option>
+                        <select id="room-finish-level" class="input-compact">
+                            <option value="level0">Level 0</option>
+                            <option value="level1">Level 1</option>
+                            <option value="level2">Level 2</option>
+                            <option value="level3">Level 3</option>
+                            <option value="level4" selected>Level 4</option>
+                            <option value="level5">Level 5</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-options">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="room-include-ceiling" checked>
-                        <span>Include ceiling in estimate</span>
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="room-include-texture">
-                        <span>Add texture finish</span>
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="room-include-primer" checked>
-                        <span>Include primer/sealer</span>
-                    </label>
+                <div class="options-compact">
+                    <label><input type="checkbox" id="room-include-ceiling" checked><span>Include Ceiling</span></label>
+                    <label><input type="checkbox" id="room-include-texture"><span>Add Texture</span></label>
+                    <label><input type="checkbox" id="room-include-primer" checked><span>Include Primer</span></label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="room-cancel-btn" class="btn btn-outline">Cancel</button>
-                <button id="room-save-btn" class="btn btn-primary">Save Room</button>
+                <button id="room-cancel-btn" class="btn-compact">Cancel</button>
+                <button id="room-save-btn" class="btn-compact btn-primary">Save</button>
             </div>
         </div>
     </div>
 
-    <!-- Stairs Properties Modal -->
-    <div id="stairs-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Stairs Properties</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Stairs Type</label>
-                    <select id="stairs-type">
-                        <option value="straight">Straight Run</option>
-                        <option value="l-shaped">L-Shaped</option>
-                        <option value="u-shaped">U-Shaped</option>
-                        <option value="spiral">Spiral</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Number of Risers</label>
-                    <input type="number" id="stairs-risers" value="14" min="3" step="1">
-                </div>
-                <div class="form-group">
-                    <label>Tread Width (inches)</label>
-                    <input type="number" id="stairs-tread-width" value="36" min="24" step="1">
-                </div>
-                <div class="form-group">
-                    <label>Riser Height (inches)</label>
-                    <input type="number" id="stairs-riser-height" value="7.5" step="0.25" min="4" max="8">
-                </div>
-                <div class="form-group">
-                    <label>Stairwell Width (feet)</label>
-                    <input type="number" id="stairs-width" value="4" step="0.5" min="3">
-                </div>
-                <div class="form-group">
-                    <label>Stairwell Length (feet)</label>
-                    <input type="number" id="stairs-length" value="12" step="0.5" min="6">
-                </div>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="stairs-walls-both-sides" checked>
-                    <span>Walls on both sides</span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="stairs-under-ceiling" checked>
-                    <span>Include ceiling under stairs</span>
-                </label>
-            </div>
-            <div class="modal-footer">
-                <button id="stairs-cancel-btn" class="btn btn-outline">Cancel</button>
-                <button id="stairs-save-btn" class="btn btn-primary">Save</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Help Modal -->
     <div id="help-modal" class="modal">
         <div class="modal-content modal-large">
             <div class="modal-header">
-                <h2>Help & Documentation</h2>
+                <h2>Help & Shortcuts</h2>
                 <button class="modal-close">&times;</button>
             </div>
-            <div class="modal-body">
-                <h3>Keyboard Shortcuts</h3>
-                <table class="shortcuts-table">
-                    <tr><td><kbd>V</kbd></td><td>Select/Move tool</td></tr>
-                    <tr><td><kbd>W</kbd></td><td>Exterior wall</td></tr>
-                    <tr><td><kbd>I</kbd></td><td>Interior wall</td></tr>
-                    <tr><td><kbd>D</kbd></td><td>Interior door</td></tr>
-                    <tr><td><kbd>E</kbd></td><td>Exterior door</td></tr>
-                    <tr><td><kbd>N</kbd></td><td>Window</td></tr>
-                    <tr><td><kbd>U</kbd></td><td>Stairs up</td></tr>
-                    <tr><td><kbd>M</kbd></td><td>Measure tool</td></tr>
-                    <tr><td><kbd>T</kbd></td><td>Text label</td></tr>
-                    <tr><td><kbd>Del</kbd></td><td>Delete selected</td></tr>
-                    <tr><td><kbd>Ctrl+Z</kbd></td><td>Undo</td></tr>
-                    <tr><td><kbd>Ctrl+Y</kbd></td><td>Redo</td></tr>
-                    <tr><td><kbd>Ctrl+S</kbd></td><td>Save project</td></tr>
-                    <tr><td><kbd>+</kbd> / <kbd>-</kbd></td><td>Zoom in/out</td></tr>
-                    <tr><td><kbd>0</kbd></td><td>Fit to view</td></tr>
-                    <tr><td><kbd>Space+Drag</kbd></td><td>Pan canvas</td></tr>
-                </table>
-
-                <h3>Drawing Tips</h3>
-                <ul>
-                    <li>Click and drag to draw walls, doors, and windows</li>
-                    <li>Double-click on a wall to add a door or window</li>
-                    <li>Enable "Snap to Grid" for precise alignment</li>
-                    <li>Use Ctrl+Click to select multiple elements</li>
-                    <li>Right-click elements for quick options</li>
-                </ul>
-
-                <h3>Wall Types</h3>
-                <ul>
-                    <li><strong>Exterior Walls:</strong> Typically 6" thick, include insulation cavity</li>
-                    <li><strong>Interior Walls:</strong> Standard 4.5" thick walls with 2x4 framing</li>
-                    <li><strong>Partition Walls:</strong> Thin non-load bearing walls</li>
-                </ul>
-
-                <h3>Calculation Methods</h3>
-                <p>The estimator calculates drywall needs based on:</p>
-                <ul>
-                    <li>Wall perimeter × ceiling height for wall area</li>
-                    <li>Room dimensions for ceiling area</li>
-                    <li>Stair geometry for angled stairwell surfaces</li>
-                    <li>Automatic deduction for doors and windows</li>
-                    <li>Configurable waste factor (default 10%)</li>
-                </ul>
+            <div class="modal-body scrollable">
+                <div class="help-section">
+                    <h3>🎹 Keyboard Shortcuts</h3>
+                    <div class="shortcuts-grid">
+                        <div><kbd>V</kbd> Select/Move</div>
+                        <div><kbd>W</kbd> Exterior Wall</div>
+                        <div><kbd>I</kbd> Interior Wall</div>
+                        <div><kbd>P</kbd> Partition</div>
+                        <div><kbd>D</kbd> Interior Door</div>
+                        <div><kbd>E</kbd> Exterior Door</div>
+                        <div><kbd>N</kbd> Window</div>
+                        <div><kbd>U</kbd> Stairs Up</div>
+                        <div><kbd>M</kbd> Measure</div>
+                        <div><kbd>T</kbd> Text</div>
+                        <div><kbd>Del</kbd> Delete</div>
+                        <div><kbd>Ctrl+Z</kbd> Undo</div>
+                        <div><kbd>Ctrl+Y</kbd> Redo</div>
+                        <div><kbd>Ctrl+S</kbd> Save</div>
+                        <div><kbd>+</kbd> / <kbd>-</kbd> Zoom</div>
+                        <div><kbd>0</kbd> Fit View</div>
+                    </div>
+                </div>
+                <div class="help-section">
+                    <h3>🖱️ Mouse Controls</h3>
+                    <ul class="help-list">
+                        <li><strong>Click & Drag:</strong> Draw elements</li>
+                        <li><strong>Double-Click Wall:</strong> Add door/window</li>
+                        <li><strong>Mouse Wheel:</strong> Zoom in/out</li>
+                        <li><strong>Middle Button:</strong> Pan canvas</li>
+                        <li><strong>Ctrl+Click:</strong> Multi-select</li>
+                    </ul>
+                </div>
+                <div class="help-section">
+                    <h3>💡 Quick Tips</h3>
+                    <ul class="help-list">
+                        <li>Enable <strong>Snap to Grid</strong> for precision</li>
+                        <li>Use <strong>Auto-Detect Rooms</strong> after drawing walls</li>
+                        <li>Check <strong>Smart Tips</strong> tab for recommendations</li>
+                        <li>Save often - autosaves every 60 seconds</li>
+                        <li>Collapse panels for more drawing space</li>
+                    </ul>
+                </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary modal-close">Got It!</button>
+                <button class="btn-compact btn-primary modal-close">Got It!</button>
             </div>
         </div>
     </div>
 
-    <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-spinner"></div>
         <p>Loading...</p>
     </div>
 
-    <!-- Scripts -->
     <script src="utils.js"></script>
     <script src="calculator.js"></script>
     <script src="recommendations.js"></script>

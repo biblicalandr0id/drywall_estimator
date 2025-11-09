@@ -51,6 +51,7 @@ class DrywallEstimatorApp {
         this.setupProjectManagement();
         this.setupKeyboardShortcuts();
         this.setupModals();
+        this.setupCollapsibleUI();
 
         // Initialize floor list
         this.updateFloorList();
@@ -1027,6 +1028,76 @@ class DrywallEstimatorApp {
         if (statusElement) {
             statusElement.textContent = message;
         }
+    }
+
+    // ==================== COLLAPSIBLE UI ====================
+
+    setupCollapsibleUI() {
+        // Sidebar toggles
+        this.setupSidebarToggles();
+
+        // Collapsible panel headers
+        this.setupCollapsiblePanels();
+    }
+
+    setupSidebarToggles() {
+        const leftSidebar = document.getElementById('left-sidebar');
+        const rightSidebar = document.getElementById('right-sidebar');
+        const leftToggle = document.getElementById('left-toggle');
+        const rightToggle = document.getElementById('right-toggle');
+
+        // Left sidebar toggle
+        leftToggle?.addEventListener('click', () => {
+            leftSidebar?.classList.toggle('collapsed');
+            const icon = leftToggle.querySelector('.toggle-icon');
+            if (leftSidebar?.classList.contains('collapsed')) {
+                icon.textContent = '▶';
+            } else {
+                icon.textContent = '◀';
+            }
+            // Trigger resize on blueprint
+            setTimeout(() => this.blueprint?.resize(), 300);
+        });
+
+        // Right sidebar toggle
+        rightToggle?.addEventListener('click', () => {
+            rightSidebar?.classList.toggle('collapsed');
+            const icon = rightToggle.querySelector('.toggle-icon');
+            if (rightSidebar?.classList.contains('collapsed')) {
+                icon.textContent = '◀';
+            } else {
+                icon.textContent = '▶';
+            }
+            // Trigger resize on blueprint
+            setTimeout(() => this.blueprint?.resize(), 300);
+        });
+    }
+
+    setupCollapsiblePanels() {
+        const headers = document.querySelectorAll('.collapsible-header');
+
+        headers.forEach(header => {
+            header.addEventListener('click', () => {
+                const panelId = header.dataset.panel;
+                const content = document.getElementById(`${panelId}-panel`);
+
+                if (content) {
+                    const isCollapsed = content.classList.contains('collapsed');
+
+                    // Toggle collapsed state
+                    content.classList.toggle('collapsed');
+
+                    // Update icon
+                    const icon = header.querySelector('.expand-icon');
+                    if (icon) {
+                        icon.textContent = isCollapsed ? '−' : '+';
+                    }
+
+                    // Mark header as collapsed
+                    header.classList.toggle('collapsed', !isCollapsed);
+                }
+            });
+        });
     }
 }
 
