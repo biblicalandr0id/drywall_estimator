@@ -41,7 +41,7 @@ class DrywallEstimatorApp {
         });
 
         // Setup event listeners
-        this.setupToolButtons();
+        this.setupCollapsibleUI();
         this.setupViewControls();
         this.setupFloorManagement();
         this.setupLayerControls();
@@ -51,7 +51,6 @@ class DrywallEstimatorApp {
         this.setupProjectManagement();
         this.setupKeyboardShortcuts();
         this.setupModals();
-        this.setupCollapsibleUI();
 
         // Initialize floor list
         this.updateFloorList();
@@ -69,26 +68,6 @@ class DrywallEstimatorApp {
     }
 
     // ==================== TOOL MANAGEMENT ====================
-
-    setupToolButtons() {
-        const toolButtons = document.querySelectorAll('.tool-btn');
-
-        toolButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Remove active class from all buttons
-                toolButtons.forEach(b => b.classList.remove('active'));
-
-                // Add active class to clicked button
-                btn.classList.add('active');
-
-                // Set tool in blueprint manager
-                const tool = btn.dataset.tool;
-                this.blueprint.setTool(tool);
-
-                this.setStatus(`Tool: ${this.getToolName(tool)}`);
-            });
-        });
-    }
 
     getToolName(tool) {
         const names = {
@@ -319,19 +298,35 @@ class DrywallEstimatorApp {
     // ==================== TABS ====================
 
     setupTabs() {
-        const tabButtons = document.querySelectorAll('.tab-btn');
+        // Ribbon tab switching
+        const ribbonTabs = document.querySelectorAll('.ribbon-tab');
+        ribbonTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const ribbonId = tab.dataset.ribbon;
 
-        tabButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabId = btn.dataset.tab;
+                // Remove active from all tabs and ribbons
+                ribbonTabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.ribbon').forEach(r => r.classList.remove('active'));
 
-                // Remove active class from all tabs
-                tabButtons.forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                // Activate clicked tab and corresponding ribbon
+                tab.classList.add('active');
+                document.getElementById(`${ribbonId}-ribbon`)?.classList.add('active');
+            });
+        });
 
-                // Add active class to clicked tab
-                btn.classList.add('active');
-                document.getElementById(`${tabId}-tab`)?.classList.add('active');
+        // Side panel tab switching
+        const panelTabs = document.querySelectorAll('.panel-tab');
+        panelTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const panelId = tab.dataset.panelTab;
+
+                // Remove active from all panel tabs
+                panelTabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('active'));
+
+                // Activate clicked tab and content
+                tab.classList.add('active');
+                document.getElementById(`${panelId}-panel-content`)?.classList.add('active');
             });
         });
     }
@@ -1030,40 +1025,17 @@ class DrywallEstimatorApp {
         }
     }
 
-    // ==================== COLLAPSIBLE UI ====================
+    // ==================== RIBBON UI ====================
 
     setupCollapsibleUI() {
-        // Sidebar toggles
-        this.setupSidebarToggles();
+        // Side panel toggle
+        const sidePanel = document.getElementById('side-panel');
+        const panelToggle = document.getElementById('panel-toggle');
 
-        // Collapsible panel headers
-        this.setupCollapsiblePanels();
-    }
-
-    setupSidebarToggles() {
-        const leftSidebar = document.getElementById('left-sidebar');
-        const rightSidebar = document.getElementById('right-sidebar');
-        const leftToggle = document.getElementById('left-toggle');
-        const rightToggle = document.getElementById('right-toggle');
-
-        // Left sidebar toggle
-        leftToggle?.addEventListener('click', () => {
-            leftSidebar?.classList.toggle('collapsed');
-            const icon = leftToggle.querySelector('.toggle-icon');
-            if (leftSidebar?.classList.contains('collapsed')) {
-                icon.textContent = '▶';
-            } else {
-                icon.textContent = '◀';
-            }
-            // Trigger resize on blueprint
-            setTimeout(() => this.blueprint?.resize(), 300);
-        });
-
-        // Right sidebar toggle
-        rightToggle?.addEventListener('click', () => {
-            rightSidebar?.classList.toggle('collapsed');
-            const icon = rightToggle.querySelector('.toggle-icon');
-            if (rightSidebar?.classList.contains('collapsed')) {
+        panelToggle?.addEventListener('click', () => {
+            sidePanel?.classList.toggle('collapsed');
+            const icon = panelToggle.querySelector('.toggle-icon');
+            if (sidePanel?.classList.contains('collapsed')) {
                 icon.textContent = '◀';
             } else {
                 icon.textContent = '▶';
@@ -1071,30 +1043,61 @@ class DrywallEstimatorApp {
             // Trigger resize on blueprint
             setTimeout(() => this.blueprint?.resize(), 300);
         });
+
+        // Tool buttons across all ribbons (handled by data-tool attribute)
+        const toolButtons = document.querySelectorAll('[data-tool]');
+        toolButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active from all tool buttons
+                toolButtons.forEach(b => b.classList.remove('active'));
+
+                // Add active to clicked button
+                btn.classList.add('active');
+
+                // Set tool in blueprint
+                const tool = btn.dataset.tool;
+                if (this.blueprint) {
+                    this.blueprint.setTool(tool);
+                    this.setStatus(`Tool: ${this.getToolName(tool)}`);
+                }
+            });
+        });
+
+        // Toggle buttons (layers, display options, snap, etc.)
+        this.setupToggleButtons();
     }
 
-    setupCollapsiblePanels() {
-        const headers = document.querySelectorAll('.collapsible-header');
+    setupToggleButtons() {
+        const toggleButtons = document.querySelectorAll('.icon-btn.toggle');
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
 
-        headers.forEach(header => {
-            header.addEventListener('click', () => {
-                const panelId = header.dataset.panel;
-                const content = document.getElementById(`${panelId}-panel`);
-
-                if (content) {
-                    const isCollapsed = content.classList.contains('collapsed');
-
-                    // Toggle collapsed state
-                    content.classList.toggle('collapsed');
-
-                    // Update icon
-                    const icon = header.querySelector('.expand-icon');
-                    if (icon) {
-                        icon.textContent = isCollapsed ? '−' : '+';
+                // Handle specific toggles
+                const id = btn.id;
+                if (id === 'snap-to-grid' && this.blueprint) {
+                    this.blueprint.snapToGrid = btn.classList.contains('active');
+                } else if (id === 'show-grid' && this.blueprint) {
+                    this.blueprint.layers.grid = btn.classList.contains('active');
+                    this.blueprint.draw();
+                } else if (id === 'show-dimensions' && this.blueprint) {
+                    this.blueprint.layers.dimensions = btn.classList.contains('active');
+                    this.blueprint.draw();
+                } else if (id === 'show-room-labels' && this.blueprint) {
+                    this.blueprint.layers.roomLabels = btn.classList.contains('active');
+                    this.blueprint.draw();
+                } else if (id.startsWith('layer-')) {
+                    const layer = id.replace('layer-', '');
+                    if (this.blueprint && this.blueprint.layers[layer] !== undefined) {
+                        this.blueprint.layers[layer] = btn.classList.contains('active');
+                        this.blueprint.draw();
                     }
-
-                    // Mark header as collapsed
-                    header.classList.toggle('collapsed', !isCollapsed);
+                } else if (id === 'quick-include-ceiling') {
+                    // Handle quick ceiling toggle
+                } else if (id === 'quick-include-texture') {
+                    // Handle quick texture toggle
+                } else if (id === 'quick-include-primer') {
+                    // Handle quick primer toggle
                 }
             });
         });
