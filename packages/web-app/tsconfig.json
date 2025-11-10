@@ -1,0 +1,9 @@
+{
+  "extends": "@drywall/tsconfig/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["src/**/*", "public/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

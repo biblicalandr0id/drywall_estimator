@@ -1,0 +1,25 @@
+{
+  "name": "@drywall/web-app",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Main web application for drywall estimation",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@drywall/core": "workspace:*",
+    "@drywall/blueprint-engine": "workspace:*",
+    "@drywall/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@drywall/tsconfig": "workspace:*",
+    "typescript": "^5.4.2",
+    "vite": "^5.1.4"
+  }
+}
