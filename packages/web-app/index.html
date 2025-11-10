@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Drywall Estimator - Advanced Blueprint Designer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container ribbon-layout">
+        <!-- Compact Header Bar -->
+        <header class="app-header">
+            <div class="app-title">
+                <span class="app-icon">📐</span>
+                <span class="app-name">Drywall Estimator</span>
+            </div>
+            <div class="quick-access">
+                <button class="icon-btn" id="new-project-btn" title="New Project (Ctrl+N)">📄</button>
+                <button class="icon-btn" id="load-project-btn" title="Load Project (Ctrl+O)">📂</button>
+                <button class="icon-btn" id="save-project-btn" title="Save Project (Ctrl+S)">💾</button>
+                <button class="icon-btn" id="undo-btn" title="Undo (Ctrl+Z)" disabled>↶</button>
+                <button class="icon-btn" id="redo-btn" title="Redo (Ctrl+Y)" disabled>↷</button>
+            </div>
+        </header>
+
+        <!-- Ribbon Tabs -->
+        <div class="ribbon-tabs">
+            <button class="ribbon-tab active" data-ribbon="home">Home</button>
+            <button class="ribbon-tab" data-ribbon="draw">Draw</button>
+            <button class="ribbon-tab" data-ribbon="view">View</button>
+            <button class="ribbon-tab" data-ribbon="rooms">Rooms</button>
+            <button class="ribbon-tab" data-ribbon="estimate">Estimate</button>
+            <button class="ribbon-tab" data-ribbon="help">Help</button>
+        </div>
+
+        <!-- Home Ribbon -->
+        <div class="ribbon active" id="home-ribbon">
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Tools</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn active" data-tool="select" title="Select/Move Tool (V)">
+                        <span class="icon">↖</span>
+                        <span class="label">Select</span>
+                    </button>
+                    <button class="icon-btn" data-tool="measure" title="Measure Distance (M)">
+                        <span class="icon">📏</span>
+                        <span class="label">Measure</span>
+                    </button>
+                    <button class="icon-btn" data-tool="text" title="Add Text Label (T)">
+                        <span class="icon">T</span>
+                        <span class="label">Text</span>
+                    </button>
+                    <button class="icon-btn" data-tool="erase" title="Erase Element (Del)">
+                        <span class="icon">⌫</span>
+                        <span class="label">Erase</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Walls</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" data-tool="wall-exterior" title="Draw Exterior Wall - 6 inches (W)">
+                        <span class="icon">━</span>
+                        <span class="label">Exterior</span>
+                    </button>
+                    <button class="icon-btn" data-tool="wall-interior" title="Draw Interior Wall - 4.5 inches (I)">
+                        <span class="icon">─</span>
+                        <span class="label">Interior</span>
+                    </button>
+                    <button class="icon-btn" data-tool="wall-partition" title="Draw Partition Wall - 3.5 inches (P)">
+                        <span class="icon">┄</span>
+                        <span class="label">Partition</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Openings</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" data-tool="door-interior" title="Interior Door - 32 inches (D)">
+                        <span class="icon">🚪</span>
+                        <span class="label">Int Door</span>
+                    </button>
+                    <button class="icon-btn" data-tool="door-exterior" title="Exterior Door - 36 inches (E)">
+                        <span class="icon">🚪</span>
+                        <span class="label">Ext Door</span>
+                    </button>
+                    <button class="icon-btn" data-tool="window-standard" title="Standard Window - 36x48 inches (N)">
+                        <span class="icon">▯</span>
+                        <span class="label">Window</span>
+                    </button>
+                    <button class="icon-btn" data-tool="window-large" title="Large Window - 72x60 inches">
+                        <span class="icon">▭</span>
+                        <span class="label">Lg Window</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Stairs</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" data-tool="stairs-up" title="Stairs Going Up (U)">
+                        <span class="icon">⬆</span>
+                        <span class="label">Up</span>
+                    </button>
+                    <button class="icon-btn" data-tool="stairs-down" title="Stairs Going Down">
+                        <span class="icon">⬇</span>
+                        <span class="label">Down</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Actions</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" id="clear-all-btn" title="Clear All Elements">
+                        <span class="icon">🗑️</span>
+                        <span class="label">Clear</span>
+                    </button>
+                    <button class="icon-btn" id="export-image-btn" title="Export as Image">
+                        <span class="icon">🖼️</span>
+                        <span class="label">Image</span>
+                    </button>
+                    <button class="icon-btn" id="export-pdf-btn" title="Export as PDF">
+                        <span class="icon">📄</span>
+                        <span class="label">PDF</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Draw Ribbon -->
+        <div class="ribbon" id="draw-ribbon">
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Drawing</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" data-tool="select" title="Select/Move (V)">
+                        <span class="icon">↖</span>
+                        <span class="label">Select</span>
+                    </button>
+                    <button class="icon-btn" data-tool="wall-exterior" title="Exterior Wall (W)">
+                        <span class="icon">━</span>
+                        <span class="label">Ext</span>
+                    </button>
+                    <button class="icon-btn" data-tool="wall-interior" title="Interior Wall (I)">
+                        <span class="icon">─</span>
+                        <span class="label">Int</span>
+                    </button>
+                    <button class="icon-btn" data-tool="wall-partition" title="Partition (P)">
+                        <span class="icon">┄</span>
+                        <span class="label">Part</span>
+                    </button>
+                    <button class="icon-btn" data-tool="door-interior" title="Interior Door (D)">
+                        <span class="icon">🚪</span>
+                        <span class="label">Door</span>
+                    </button>
+                    <button class="icon-btn" data-tool="door-exterior" title="Exterior Door (E)">
+                        <span class="icon">🚪</span>
+                        <span class="label">Ext D</span>
+                    </button>
+                    <button class="icon-btn" data-tool="window-standard" title="Window (N)">
+                        <span class="icon">▯</span>
+                        <span class="label">Win</span>
+                    </button>
+                    <button class="icon-btn" data-tool="window-large" title="Large Window">
+                        <span class="icon">▭</span>
+                        <span class="label">Lg Win</span>
+                    </button>
+                    <button class="icon-btn" data-tool="stairs-up" title="Stairs Up (U)">
+                        <span class="icon">⬆</span>
+                        <span class="label">Up</span>
+                    </button>
+                    <button class="icon-btn" data-tool="stairs-down" title="Stairs Down">
+                        <span class="icon">⬇</span>
+                        <span class="label">Down</span>
+                    </button>
+                    <button class="icon-btn" data-tool="room-auto" title="Auto Room Detection (R)">
+                        <span class="icon">□</span>
+                        <span class="label">Room</span>
+                    </button>
+                    <button class="icon-btn" data-tool="measure" title="Measure (M)">
+                        <span class="icon">📏</span>
+                        <span class="label">Msre</span>
+                    </button>
+                    <button class="icon-btn" data-tool="text" title="Text (T)">
+                        <span class="icon">T</span>
+                        <span class="label">Text</span>
+                    </button>
+                    <button class="icon-btn" data-tool="erase" title="Erase (Del)">
+                        <span class="icon">⌫</span>
+                        <span class="label">Erase</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Snap</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn toggle active" id="snap-to-grid" title="Snap to Grid">
+                        <span class="icon">⊞</span>
+                        <span class="label">Grid Snap</span>
+                    </button>
+                    <button class="icon-btn toggle" id="snap-to-wall" title="Snap to Walls">
+                        <span class="icon">╬</span>
+                        <span class="label">Wall Snap</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Dimensions</div>
+                <div class="ribbon-icons-inline">
+                    <label class="ribbon-label" title="Grid Spacing">Grid:</label>
+                    <input type="number" id="grid-spacing" value="12" min="1" max="120" class="ribbon-input-sm" title="Grid Spacing (inches)">
+                    <label class="ribbon-label" title="Wall Height">Height:</label>
+                    <input type="number" id="wall-height" value="8" min="6" max="20" step="0.5" class="ribbon-input-sm" title="Default Wall Height (feet)">
+                </div>
+            </div>
+        </div>
+
+        <!-- View Ribbon -->
+        <div class="ribbon" id="view-ribbon">
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Zoom</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" id="zoom-in-btn" title="Zoom In (+)">
+                        <span class="icon">🔍+</span>
+                        <span class="label">Zoom In</span>
+                    </button>
+                    <button class="icon-btn" id="zoom-out-btn" title="Zoom Out (-)">
+                        <span class="icon">🔍−</span>
+                        <span class="label">Zoom Out</span>
+                    </button>
+                    <button class="icon-btn" id="zoom-fit-btn" title="Fit to Window (0)">
+                        <span class="icon">⊡</span>
+                        <span class="label">Fit</span>
+                    </button>
+                    <button class="icon-btn" id="zoom-reset-btn" title="Reset Zoom (1:1)">
+                        <span class="icon">↺</span>
+                        <span class="label">Reset</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Display</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn toggle active" id="show-grid" title="Show Grid">
+                        <span class="icon">⊞</span>
+                        <span class="label">Grid</span>
+                    </button>
+                    <button class="icon-btn toggle active" id="show-dimensions" title="Show Dimensions">
+                        <span class="icon">📏</span>
+                        <span class="label">Dims</span>
+                    </button>
+                    <button class="icon-btn toggle active" id="show-room-labels" title="Show Room Labels">
+                        <span class="icon">🏷️</span>
+                        <span class="label">Labels</span>
+                    </button>
+                    <button class="icon-btn toggle" id="show-measurements" title="Show All Measurements">
+                        <span class="icon">📐</span>
+                        <span class="label">Measure</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Layers</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn toggle active" id="layer-walls" title="Show Walls Layer">
+                        <span class="icon">━</span>
+                        <span class="label">Walls</span>
+                    </button>
+                    <button class="icon-btn toggle active" id="layer-doors" title="Show Doors Layer">
+                        <span class="icon">🚪</span>
+                        <span class="label">Doors</span>
+                    </button>
+                    <button class="icon-btn toggle active" id="layer-windows" title="Show Windows Layer">
+                        <span class="icon">▯</span>
+                        <span class="label">Windows</span>
+                    </button>
+                    <button class="icon-btn toggle active" id="layer-stairs" title="Show Stairs Layer">
+                        <span class="icon">⬆</span>
+                        <span class="label">Stairs</span>
+                    </button>
+                    <button class="icon-btn toggle active" id="layer-rooms" title="Show Rooms Layer">
+                        <span class="icon">🏠</span>
+                        <span class="label">Rooms</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Floors</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" id="add-floor-btn" title="Add New Floor">
+                        <span class="icon">➕</span>
+                        <span class="label">Add</span>
+                    </button>
+                    <button class="icon-btn" id="prev-floor-btn" title="Previous Floor">
+                        <span class="icon">⬅</span>
+                        <span class="label">Prev</span>
+                    </button>
+                    <button class="icon-btn" id="next-floor-btn" title="Next Floor">
+                        <span class="icon">➡</span>
+                        <span class="label">Next</span>
+                    </button>
+                </div>
+                <div class="ribbon-icons-inline">
+                    <select id="floor-selector" class="ribbon-select" title="Current Floor">
+                        <option value="0">Floor 1</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rooms Ribbon -->
+        <div class="ribbon" id="rooms-ribbon">
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Rooms</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" id="add-room-manual-btn" title="Add Room Manually">
+                        <span class="icon">➕</span>
+                        <span class="label">Add</span>
+                    </button>
+                    <button class="icon-btn" id="detect-rooms-btn" title="Auto-Detect Rooms from Walls">
+                        <span class="icon">🔍</span>
+                        <span class="label">Detect</span>
+                    </button>
+                    <button class="icon-btn" id="edit-room-btn" title="Edit Selected Room">
+                        <span class="icon">✏️</span>
+                        <span class="label">Edit</span>
+                    </button>
+                    <button class="icon-btn" id="delete-room-btn" title="Delete Selected Room">
+                        <span class="icon">🗑️</span>
+                        <span class="label">Delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Room Type</div>
+                <div class="ribbon-icons-inline">
+                    <select id="quick-room-type" class="ribbon-select" title="Quick Room Type">
+                        <option value="living">Living Room</option>
+                        <option value="bedroom">Bedroom</option>
+                        <option value="kitchen">Kitchen</option>
+                        <option value="bathroom">Bathroom</option>
+                        <option value="dining">Dining Room</option>
+                        <option value="office">Office</option>
+                        <option value="garage">Garage</option>
+                        <option value="basement">Basement</option>
+                        <option value="hallway">Hallway</option>
+                        <option value="utility">Utility</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Drywall Type</div>
+                <div class="ribbon-icons-inline">
+                    <select id="quick-drywall-type" class="ribbon-select" title="Drywall Type">
+                        <option value="standard">Standard 1/2"</option>
+                        <option value="moisture">Moisture-Resistant</option>
+                        <option value="firerated">Fire-Rated 5/8"</option>
+                        <option value="typex">Type X</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Finish Level</div>
+                <div class="ribbon-icons-inline">
+                    <select id="quick-finish-level" class="ribbon-select" title="Finish Quality Level">
+                        <option value="level0">Level 0 - Temporary</option>
+                        <option value="level1">Level 1 - Basic Tape</option>
+                        <option value="level2">Level 2 - Tape + Coat</option>
+                        <option value="level3">Level 3 - Texture Ready</option>
+                        <option value="level4" selected>Level 4 - Paint Ready</option>
+                        <option value="level5">Level 5 - Premium</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Options</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn toggle active" id="quick-include-ceiling" title="Include Ceiling in Estimate">
+                        <span class="icon">⬜</span>
+                        <span class="label">Ceiling</span>
+                    </button>
+                    <button class="icon-btn toggle" id="quick-include-texture" title="Include Texture">
+                        <span class="icon">≋</span>
+                        <span class="label">Texture</span>
+                    </button>
+                    <button class="icon-btn toggle active" id="quick-include-primer" title="Include Primer">
+                        <span class="icon">🎨</span>
+                        <span class="label">Primer</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estimate Ribbon -->
+        <div class="ribbon" id="estimate-ribbon">
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Calculate</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn btn-primary" id="calculate-estimate-btn" title="Calculate Full Estimate">
+                        <span class="icon">🧮</span>
+                        <span class="label">Calculate</span>
+                    </button>
+                    <button class="icon-btn" id="refresh-estimate-btn" title="Refresh Estimate">
+                        <span class="icon">↻</span>
+                        <span class="label">Refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Pricing Preset</div>
+                <div class="ribbon-icons-inline">
+                    <select id="price-preset-select" class="ribbon-select" title="Pricing Region/Preset">
+                        <option value="custom">Custom Prices</option>
+                        <option value="national-standard">National Average</option>
+                        <option value="national-premium">National Premium</option>
+                        <option value="national-economy">National Economy</option>
+                        <option value="northeast-standard">Northeast</option>
+                        <option value="southeast-standard">Southeast</option>
+                        <option value="midwest-standard">Midwest</option>
+                        <option value="southwest-standard">Southwest</option>
+                        <option value="west-standard">West Coast</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Material Prices</div>
+                <div class="ribbon-icons-inline">
+                    <label class="ribbon-label-sm" title="1/2 inch Standard Drywall">Std:</label>
+                    <input type="number" id="price-drywall-standard" value="15.00" step="0.50" class="ribbon-input-xs" title="Standard Drywall Price">
+                    <label class="ribbon-label-sm" title="5/8 inch Fire-Rated">Fire:</label>
+                    <input type="number" id="price-drywall-firerated" value="18.00" step="0.50" class="ribbon-input-xs" title="Fire-Rated Price">
+                    <label class="ribbon-label-sm" title="Moisture-Resistant">Moist:</label>
+                    <input type="number" id="price-drywall-moisture" value="22.50" step="0.50" class="ribbon-input-xs" title="Moisture-Resistant Price">
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Labor Rates</div>
+                <div class="ribbon-icons-inline">
+                    <label class="ribbon-label-sm" title="Hanging Labor Rate">Hang:</label>
+                    <input type="number" id="labor-hanging" value="0.80" step="0.05" class="ribbon-input-xs" title="Hanging Rate ($/sqft)">
+                    <label class="ribbon-label-sm" title="Taping Labor Rate">Tape:</label>
+                    <input type="number" id="labor-taping" value="0.90" step="0.05" class="ribbon-input-xs" title="Taping Rate ($/sqft)">
+                    <label class="ribbon-label-sm" title="Finishing Labor Rate">Fin:</label>
+                    <input type="number" id="labor-finishing" value="0.80" step="0.05" class="ribbon-input-xs" title="Finishing Rate ($/sqft)">
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Adjustments</div>
+                <div class="ribbon-icons-inline">
+                    <label class="ribbon-label" title="Waste Factor Percentage">Waste:</label>
+                    <input type="number" id="waste-factor" value="10" min="0" max="50" class="ribbon-input-xs" title="Waste Factor %">
+                    <span class="ribbon-label-sm">%</span>
+                    <label class="ribbon-label" title="Markup Percentage">Markup:</label>
+                    <input type="number" id="markup-percent" value="20" min="0" max="100" class="ribbon-input-xs" title="Markup %">
+                    <span class="ribbon-label-sm">%</span>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Export</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" id="export-estimate-btn" title="Export Estimate to CSV">
+                        <span class="icon">💾</span>
+                        <span class="label">Export</span>
+                    </button>
+                    <button class="icon-btn" id="print-estimate-btn" title="Print Estimate">
+                        <span class="icon">🖨️</span>
+                        <span class="label">Print</span>
+                    </button>
+                    <button class="icon-btn" id="email-estimate-btn" title="Email Estimate">
+                        <span class="icon">📧</span>
+                        <span class="label">Email</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Ribbon -->
+        <div class="ribbon" id="help-ribbon">
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">Help</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" id="help-btn" title="Show Help & Shortcuts">
+                        <span class="icon">❓</span>
+                        <span class="label">Help</span>
+                    </button>
+                    <button class="icon-btn" id="shortcuts-btn" title="Keyboard Shortcuts">
+                        <span class="icon">⌨️</span>
+                        <span class="label">Shortcuts</span>
+                    </button>
+                    <button class="icon-btn" id="tips-btn" title="Show Smart Tips">
+                        <span class="icon">💡</span>
+                        <span class="label">Tips</span>
+                    </button>
+                    <button class="icon-btn" id="tutorial-btn" title="Interactive Tutorial">
+                        <span class="icon">🎓</span>
+                        <span class="label">Tutorial</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ribbon-separator"></div>
+
+            <div class="ribbon-group">
+                <div class="ribbon-group-label">About</div>
+                <div class="ribbon-icons">
+                    <button class="icon-btn" id="about-btn" title="About This App">
+                        <span class="icon">ℹ️</span>
+                        <span class="label">About</span>
+                    </button>
+                    <button class="icon-btn" id="version-btn" title="Version Info">
+                        <span class="icon">📋</span>
+                        <span class="label">Version</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Area (Full Screen) -->
+        <main class="canvas-main">
+            <div id="blueprint-container" class="blueprint-container">
+                <canvas id="grid-canvas"></canvas>
+                <canvas id="blueprint-canvas"></canvas>
+                <canvas id="overlay-canvas"></canvas>
+                <div id="canvas-tooltip" class="canvas-tooltip"></div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span id="status-message" class="status-item">Ready</span>
+                    <span id="current-floor-label" class="status-item">Floor 1</span>
+                    <span id="element-count" class="status-item">0 elements</span>
+                </div>
+                <div class="status-center">
+                    <span id="cursor-position" class="status-item">X: 0', Y: 0'</span>
+                </div>
+                <div class="status-right">
+                    <span id="scale-label" class="status-item">Scale: 1"=1'</span>
+                    <span id="zoom-label" class="status-item">Zoom: 100%</span>
+                    <span id="est-total" class="status-item status-highlight">Total: $0</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Side Panel (Collapsible) -->
+        <aside class="side-panel" id="side-panel">
+            <button class="panel-toggle" id="panel-toggle" title="Toggle Side Panel">
+                <span class="toggle-icon">▶</span>
+            </button>
+
+            <div class="panel-tabs">
+                <button class="panel-tab active" data-panel-tab="rooms" title="Rooms List">🏠</button>
+                <button class="panel-tab" data-panel-tab="estimate" title="Estimate Details">💰</button>
+                <button class="panel-tab" data-panel-tab="tips" title="Smart Tips">💡</button>
+            </div>
+
+            <div class="panel-content">
+                <!-- Rooms Panel -->
+                <div class="panel-tab-content active" id="rooms-panel-content">
+                    <div class="panel-header-sm">Rooms List</div>
+                    <div id="rooms-list" class="rooms-list-compact"></div>
+                </div>
+
+                <!-- Estimate Panel -->
+                <div class="panel-tab-content" id="estimate-panel-content">
+                    <div class="panel-header-sm">Estimate Summary</div>
+                    <div class="estimate-summary">
+                        <div class="summary-row">
+                            <span>Wall Area:</span>
+                            <span id="est-wall-area">0 sq ft</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Ceiling Area:</span>
+                            <span id="est-ceiling-area">0 sq ft</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Stairwell:</span>
+                            <span id="est-stair-area">0 sq ft</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total Area:</span>
+                            <span id="est-total-area">0 sq ft</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row">
+                            <span>Materials:</span>
+                            <span id="est-materials-cost">$0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Labor:</span>
+                            <span id="est-labor-cost">$0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Markup:</span>
+                            <span id="est-markup">$0</span>
+                        </div>
+                        <div class="summary-row grand-total">
+                            <span>Grand Total:</span>
+                            <span id="est-grand-total">$0</span>
+                        </div>
+                    </div>
+                    <div id="materials-breakdown" class="materials-breakdown-compact"></div>
+                </div>
+
+                <!-- Tips Panel -->
+                <div class="panel-tab-content" id="tips-panel-content">
+                    <div class="panel-header-sm">Smart Tips</div>
+                    <div id="recommendations-list" class="tips-list-compact">
+                        <div class="tip-card-sm info">
+                            <span class="tip-icon-sm">💡</span>
+                            <span class="tip-text-sm">Start drawing to get smart recommendations</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modals -->
+    <div id="room-modal" class="modal">
+        <div class="modal-content modal-compact">
+            <div class="modal-header">
+                <h2>Room Properties</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="room-name" placeholder="Living Room" class="input-sm">
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="room-type" class="input-sm">
+                            <option value="living">Living Room</option>
+                            <option value="bedroom">Bedroom</option>
+                            <option value="kitchen">Kitchen</option>
+                            <option value="bathroom">Bathroom</option>
+                            <option value="dining">Dining Room</option>
+                            <option value="office">Office</option>
+                            <option value="garage">Garage</option>
+                            <option value="basement">Basement</option>
+                            <option value="hallway">Hallway</option>
+                            <option value="utility">Utility</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Width (ft)</label>
+                        <input type="number" id="room-width" value="12" step="0.5" class="input-sm">
+                    </div>
+                    <div class="form-group">
+                        <label>Length (ft)</label>
+                        <input type="number" id="room-length" value="15" step="0.5" class="input-sm">
+                    </div>
+                    <div class="form-group">
+                        <label>Height (ft)</label>
+                        <input type="number" id="room-height" value="8" step="0.5" class="input-sm">
+                    </div>
+                    <div class="form-group">
+                        <label>Ceiling Type</label>
+                        <select id="room-ceiling-type" class="input-sm">
+                            <option value="standard">Standard Flat</option>
+                            <option value="vaulted">Vaulted</option>
+                            <option value="tray">Tray</option>
+                            <option value="coffered">Coffered</option>
+                            <option value="none">No Ceiling</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Drywall Type</label>
+                        <select id="room-drywall-type" class="input-sm">
+                            <option value="standard">Standard</option>
+                            <option value="moisture">Moisture-Resistant</option>
+                            <option value="firerated">Fire-Rated</option>
+                            <option value="typex">Type X</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Finish Level</label>
+                        <select id="room-finish-level" class="input-sm">
+                            <option value="level0">Level 0</option>
+                            <option value="level1">Level 1</option>
+                            <option value="level2">Level 2</option>
+                            <option value="level3">Level 3</option>
+                            <option value="level4" selected>Level 4</option>
+                            <option value="level5">Level 5</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="room-include-ceiling" checked>
+                        <span>Include Ceiling</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="room-include-texture">
+                        <span>Add Texture</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="room-include-primer" checked>
+                        <span>Include Primer</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="room-cancel-btn" class="btn-sm">Cancel</button>
+                <button id="room-save-btn" class="btn-sm btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="help-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Help & Keyboard Shortcuts</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h3>⌨️ Keyboard Shortcuts</h3>
+                    <div class="shortcuts-grid">
+                        <div><kbd>V</kbd> Select/Move</div>
+                        <div><kbd>W</kbd> Exterior Wall</div>
+                        <div><kbd>I</kbd> Interior Wall</div>
+                        <div><kbd>P</kbd> Partition</div>
+                        <div><kbd>D</kbd> Interior Door</div>
+                        <div><kbd>E</kbd> Exterior Door</div>
+                        <div><kbd>N</kbd> Window</div>
+                        <div><kbd>U</kbd> Stairs Up</div>
+                        <div><kbd>M</kbd> Measure</div>
+                        <div><kbd>T</kbd> Text</div>
+                        <div><kbd>Del</kbd> Delete</div>
+                        <div><kbd>Ctrl+Z</kbd> Undo</div>
+                        <div><kbd>Ctrl+Y</kbd> Redo</div>
+                        <div><kbd>Ctrl+S</kbd> Save</div>
+                        <div><kbd>+</kbd> / <kbd>-</kbd> Zoom</div>
+                        <div><kbd>0</kbd> Fit View</div>
+                    </div>
+                </div>
+                <div class="help-section">
+                    <h3>🖱️ Mouse Controls</h3>
+                    <ul class="help-list">
+                        <li><strong>Click & Drag:</strong> Draw elements</li>
+                        <li><strong>Double-Click Wall:</strong> Add door/window</li>
+                        <li><strong>Mouse Wheel:</strong> Zoom in/out</li>
+                        <li><strong>Middle Button:</strong> Pan canvas</li>
+                        <li><strong>Ctrl+Click:</strong> Multi-select</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-sm btn-primary modal-close">Got It!</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <script src="utils.js"></script>
+    <script src="calculator.js"></script>
+    <script src="recommendations.js"></script>
+    <script src="blueprint.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
