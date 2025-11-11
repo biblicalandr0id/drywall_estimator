@@ -3,7 +3,8 @@
  * Handles all canvas operations, drawing tools, and blueprint management
  */
 
-class BlueprintManager {
+// Export BlueprintManager as default and named export
+export default class BlueprintManager {
     constructor(canvasIds, options = {}) {
         // Canvas references
         this.gridCanvas = document.getElementById(canvasIds.grid);
@@ -1199,7 +1200,5 @@ class BlueprintManager {
     }
 }
 
-// Export
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = BlueprintManager;
-}
+// Also export as named export for flexibility
+export { BlueprintManager };
