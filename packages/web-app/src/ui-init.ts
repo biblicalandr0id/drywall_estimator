@@ -197,13 +197,21 @@ function initModals(): void {
 
 function initLoadingStates(): void {
     // Wrap fetch calls with loading indicator
+    // Track concurrent requests to avoid hiding overlay prematurely
+    let activeRequests = 0;
     const originalFetch = window.fetch;
     window.fetch = async function(...args) {
-        loading.show('Loading data...');
+        activeRequests++;
+        if (activeRequests === 1) {
+            loading.show('Loading data...');
+        }
         try {
             return await originalFetch.apply(this, args);
         } finally {
-            loading.hide();
+            activeRequests--;
+            if (activeRequests === 0) {
+                loading.hide();
+            }
         }
     };
 
