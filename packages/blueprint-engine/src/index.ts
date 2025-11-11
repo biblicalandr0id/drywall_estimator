@@ -1200,6 +1200,4 @@ class BlueprintManager {
 }
 
 // Export
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = BlueprintManager;
-}
+export default BlueprintManager;

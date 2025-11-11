@@ -3,6 +3,9 @@
  * Initializes and coordinates all components of the Drywall Estimator
  */
 
+import BlueprintManager from '@drywall/blueprint-engine';
+import { DrywallCalculator, Utils } from '@drywall/core';
+
 class DrywallEstimatorApp {
     constructor() {
         this.blueprint = null;
