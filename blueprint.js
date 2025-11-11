@@ -534,27 +534,69 @@ class BlueprintManager {
     drawCurrentDrawing(ctx) {
         const toolType = this.currentTool;
 
-        ctx.strokeStyle = '#3b82f6';
-        ctx.lineWidth = 3 / this.zoom;
-        ctx.setLineDash([5 / this.zoom, 5 / this.zoom]);
+        // Vibrant drawing color with gradient
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 4 / this.zoom;
+        ctx.setLineDash([8 / this.zoom, 4 / this.zoom]);
+        ctx.lineCap = 'round';
+        ctx.shadowColor = 'rgba(37, 99, 235, 0.4)';
+        ctx.shadowBlur = 8 / this.zoom;
 
         if (toolType.startsWith('wall') || toolType.startsWith('door') ||
             toolType.startsWith('window') || toolType === 'measure') {
+            // Draw the line
             ctx.beginPath();
             ctx.moveTo(this.startPoint.x, this.startPoint.y);
             ctx.lineTo(this.currentPoint.x, this.currentPoint.y);
             ctx.stroke();
 
-            // Show distance
+            // Draw start point indicator
+            ctx.fillStyle = '#2563eb';
+            ctx.shadowBlur = 12 / this.zoom;
+            ctx.beginPath();
+            ctx.arc(this.startPoint.x, this.startPoint.y, 6 / this.zoom, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw end point indicator
+            ctx.beginPath();
+            ctx.arc(this.currentPoint.x, this.currentPoint.y, 6 / this.zoom, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+
+            // Show distance with modern badge
             const distance = Utils.geometry.distance(this.startPoint, this.currentPoint) / this.scale;
             const mid = Utils.geometry.midpoint(this.startPoint, this.currentPoint);
 
-            ctx.fillStyle = '#000';
-            ctx.font = `${12 / this.zoom}px sans-serif`;
+            // Draw distance badge background
+            const text = `${distance.toFixed(1)}'`;
+            ctx.font = `bold ${14 / this.zoom}px sans-serif`;
+            const textMetrics = ctx.measureText(text);
+            const padding = 8 / this.zoom;
+            const badgeWidth = textMetrics.width + padding * 2;
+            const badgeHeight = 24 / this.zoom;
+
+            ctx.fillStyle = '#2563eb';
+            ctx.shadowColor = 'rgba(37, 99, 235, 0.3)';
+            ctx.shadowBlur = 8 / this.zoom;
+            this.roundRect(ctx,
+                mid.x - badgeWidth / 2,
+                mid.y - badgeHeight / 2 - 15 / this.zoom,
+                badgeWidth,
+                badgeHeight,
+                4 / this.zoom
+            );
+            ctx.fill();
+
+            // Draw distance text
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'center';
-            ctx.fillText(`${distance.toFixed(1)}'`, mid.x, mid.y - 10 / this.zoom);
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, mid.x, mid.y - 15 / this.zoom);
+
         } else if (toolType.startsWith('stairs')) {
-            // Draw stairs preview
+            // Draw stairs preview with better styling
             const length = Utils.geometry.distance(this.startPoint, this.currentPoint);
             const angle = Utils.geometry.angle(this.startPoint, this.currentPoint);
             const width = length / 2;
@@ -572,32 +614,78 @@ class BlueprintManager {
                 }
             ];
 
+            // Fill with translucent color
+            ctx.fillStyle = 'rgba(37, 99, 235, 0.1)';
             ctx.beginPath();
             ctx.moveTo(corners[0].x, corners[0].y);
             corners.forEach(c => ctx.lineTo(c.x, c.y));
             ctx.closePath();
+            ctx.fill();
             ctx.stroke();
         }
 
         ctx.setLineDash([]);
+        ctx.shadowBlur = 0;
+    }
+
+    roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
     }
 
     drawElementHighlight(ctx, element, color) {
         ctx.strokeStyle = color;
-        ctx.lineWidth = 6 / this.zoom;
+        ctx.lineWidth = 8 / this.zoom;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 12 / this.zoom;
+        ctx.globalAlpha = 0.8;
 
         if (element.start && element.end) {
+            // Draw glow effect
             ctx.beginPath();
             ctx.moveTo(element.start.x, element.start.y);
             ctx.lineTo(element.end.x, element.end.y);
             ctx.stroke();
+
+            // Draw endpoints
+            ctx.fillStyle = color;
+            ctx.shadowBlur = 16 / this.zoom;
+            ctx.beginPath();
+            ctx.arc(element.start.x, element.start.y, 5 / this.zoom, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(element.end.x, element.end.y, 5 / this.zoom, 0, Math.PI * 2);
+            ctx.fill();
         } else if (element.points) {
             ctx.beginPath();
             ctx.moveTo(element.points[0].x, element.points[0].y);
             element.points.forEach(p => ctx.lineTo(p.x, p.y));
             ctx.closePath();
             ctx.stroke();
+
+            // Draw corner points
+            ctx.fillStyle = color;
+            ctx.shadowBlur = 16 / this.zoom;
+            element.points.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5 / this.zoom, 0, Math.PI * 2);
+                ctx.fill();
+            });
         }
+
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
     }
 
     // ==================== HELPER METHODS ====================

@@ -15,6 +15,9 @@ class DrywallEstimatorApp {
     init() {
         console.log('Initializing Drywall Estimator...');
 
+        // Hide loading overlay immediately
+        this.hideLoading();
+
         // Initialize project structure
         this.currentProject = {
             name: 'New Project',
@@ -65,6 +68,24 @@ class DrywallEstimatorApp {
         this.updateRecommendations();
 
         console.log('Drywall Estimator initialized successfully');
+    }
+
+    hideLoading() {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+            overlay.style.display = 'none';
+        }
+    }
+
+    showLoading(message = 'Loading...') {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) {
+            const text = overlay.querySelector('p');
+            if (text) text.textContent = message;
+            overlay.style.display = 'flex';
+            overlay.classList.add('active');
+        }
     }
 
     // ==================== TOOL MANAGEMENT ====================
