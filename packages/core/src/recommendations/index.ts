@@ -353,7 +353,7 @@ const RecommendationEngine = {
         recommendations.push({
             type: 'info',
             category: 'Best Practices',
-            title: 'Tools You'll Need',
+            title: 'Tools You will Need',
             message: `
                 Essential tools:
                 - Drywall lift (for ceilings)
@@ -598,7 +598,5 @@ const RecommendationEngine = {
     }
 };
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = RecommendationEngine;
-}
+// Export as ES module
+export default RecommendationEngine;
