@@ -646,7 +646,5 @@ const Utils = {
     }
 };
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = Utils;
-}
+// Export as ES module
+export default Utils;
