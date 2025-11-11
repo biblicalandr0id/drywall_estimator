@@ -1894,6 +1894,7 @@ html, body {
     flex-direction: column;
     gap: var(--space-4);
     z-index: var(--z-max);
+    pointer-events: none;
 }
 
 .loading-overlay.active {
