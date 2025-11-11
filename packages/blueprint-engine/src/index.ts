@@ -3,6 +3,8 @@
  * Handles all canvas operations, drawing tools, and blueprint management
  */
 
+import { Utils } from '@drywall/core';
+
 // Export BlueprintManager as default and named export
 export default class BlueprintManager {
     constructor(canvasIds, options = {}) {
