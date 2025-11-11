@@ -1,6 +1,1 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "corepack enable && corepack prepare pnpm@9.12.3 --activate && pnpm install",
-  "buildCommand": "pnpm build --filter=@drywall/web-app && cp -r packages/web-app/dist ./dist",
-  "outputDirectory": "dist"
-}
+{\n  "$schema": "https://openapi.vercel.sh/vercel.json",\n  "installCommand": "corepack enable && corepack prepare pnpm@9.12.3 --activate && pnpm install",\n  "buildCommand": "pnpm build --filter=@drywall/web-app",\n  "outputDirectory": "packages/web-app/dist"\n}
