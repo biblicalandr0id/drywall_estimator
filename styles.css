@@ -1086,3 +1086,62 @@ select[title]:hover::before {
 .text-warning {
     color: var(--color-warning);
 }
+
+/* ==================== TOOL STATUS BAR ==================== */
+.tool-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+    min-height: 48px;
+}
+
+.tool-status-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tool-status-icon {
+    font-size: 22px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-active) 100%);
+    color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.tool-status-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.tool-status-instructions {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.tool-status-hints {
+    display: flex;
+    gap: 12px;
+}
+
+.tool-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 4px 12px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}

@@ -1046,6 +1046,86 @@ class DrywallEstimatorApp {
         }
     }
 
+    updateToolStatus(tool) {
+        const iconEl = document.getElementById('tool-status-icon');
+        const nameEl = document.getElementById('tool-status-name');
+        const instructionsEl = document.getElementById('tool-status-instructions');
+
+        const toolInfo = {
+            'select': {
+                icon: '↖',
+                name: 'Select Tool',
+                instructions: 'Click to select • Drag to move • Shift+Click for multi-select'
+            },
+            'wall-exterior': {
+                icon: '━',
+                name: 'Exterior Wall',
+                instructions: 'Click and drag to draw • Shift for orthogonal • Snaps to endpoints automatically'
+            },
+            'wall-interior': {
+                icon: '─',
+                name: 'Interior Wall',
+                instructions: 'Click and drag to draw • Shift for orthogonal • Snaps to endpoints automatically'
+            },
+            'wall-partition': {
+                icon: '┄',
+                name: 'Partition Wall',
+                instructions: 'Click and drag to draw • Shift for orthogonal • Snaps to endpoints automatically'
+            },
+            'door-interior': {
+                icon: '🚪',
+                name: 'Interior Door',
+                instructions: 'Click and drag on wall to place • 32" standard width'
+            },
+            'door-exterior': {
+                icon: '🚪',
+                name: 'Exterior Door',
+                instructions: 'Click and drag on wall to place • 36" standard width'
+            },
+            'window-standard': {
+                icon: '▯',
+                name: 'Window',
+                instructions: 'Click and drag on wall to place • 36x48" standard size'
+            },
+            'window-large': {
+                icon: '▭',
+                name: 'Large Window',
+                instructions: 'Click and drag on wall to place • 72x60" large size'
+            },
+            'stairs-up': {
+                icon: '⬆',
+                name: 'Stairs Up',
+                instructions: 'Click and drag to define stairwell • 14 risers standard'
+            },
+            'stairs-down': {
+                icon: '⬇',
+                name: 'Stairs Down',
+                instructions: 'Click and drag to define stairwell • 14 risers standard'
+            },
+            'measure': {
+                icon: '📏',
+                name: 'Measure Tool',
+                instructions: 'Click and drag to measure distance between two points'
+            },
+            'text': {
+                icon: 'T',
+                name: 'Text Label',
+                instructions: 'Click to place text label • Type to enter text'
+            },
+            'erase': {
+                icon: '⌫',
+                name: 'Erase Tool',
+                instructions: 'Click on elements to delete them • Del key works on selected elements'
+            }
+        };
+
+        const info = toolInfo[tool] || toolInfo['select'];
+
+        if (iconEl) iconEl.textContent = info.icon;
+        if (nameEl) nameEl.textContent = info.name;
+        if (instructionsEl) instructionsEl.textContent = info.instructions;
+    }
+
     // ==================== RIBBON UI ====================
 
     setupCollapsibleUI() {
@@ -1079,6 +1159,7 @@ class DrywallEstimatorApp {
                 const tool = btn.dataset.tool;
                 if (this.blueprint) {
                     this.blueprint.setTool(tool);
+                    this.updateToolStatus(tool);
                     this.setStatus(`Tool: ${this.getToolName(tool)}`);
                 }
             });

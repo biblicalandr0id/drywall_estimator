@@ -28,6 +28,10 @@ class BlueprintManager {
         this.currentPoint = null;
         this.selectedElements = [];
         this.hoveredElement = null;
+        this.snapPoint = null; // Current snap point being shown
+        this.nearbyEndpoints = []; // Nearby wall endpoints for snapping
+        this.alignmentGuides = []; // Smart alignment guides
+        this.orthogonalMode = false; // Shift key for orthogonal drawing
 
         // Data
         this.walls = [];
@@ -206,6 +210,9 @@ class BlueprintManager {
         ctx.translate(this.panOffset.x, this.panOffset.y);
         ctx.scale(this.zoom, this.zoom);
 
+        // Draw alignment guides (behind everything)
+        this.drawAlignmentGuides(ctx);
+
         // Draw selection
         this.selectedElements.forEach(elem => {
             this.drawElementHighlight(ctx, elem, this.colors.selected);
@@ -216,10 +223,88 @@ class BlueprintManager {
             this.drawElementHighlight(ctx, this.hoveredElement, this.colors.hovered);
         }
 
+        // Draw snap indicator
+        if (this.snapPoint) {
+            this.drawSnapIndicator(ctx, this.snapPoint);
+        }
+
         // Draw current drawing
         if (this.isDrawing && this.startPoint && this.currentPoint) {
             this.drawCurrentDrawing(ctx);
         }
+
+        ctx.restore();
+    }
+
+    drawSnapIndicator(ctx, point) {
+        const size = 12 / this.zoom;
+
+        ctx.save();
+        ctx.strokeStyle = '#10b981'; // Green for snap points
+        ctx.fillStyle = '#10b981';
+        ctx.lineWidth = 2 / this.zoom;
+        ctx.shadowColor = 'rgba(16, 185, 129, 0.5)';
+        ctx.shadowBlur = 8 / this.zoom;
+
+        if (point.type === 'endpoint') {
+            // Draw square for endpoints
+            ctx.strokeRect(
+                point.x - size / 2,
+                point.y - size / 2,
+                size,
+                size
+            );
+        } else if (point.type === 'midpoint') {
+            // Draw triangle for midpoints
+            ctx.beginPath();
+            ctx.moveTo(point.x, point.y - size / 2);
+            ctx.lineTo(point.x + size / 2, point.y + size / 2);
+            ctx.lineTo(point.x - size / 2, point.y + size / 2);
+            ctx.closePath();
+            ctx.stroke();
+        } else if (point.type === 'grid') {
+            // Draw circle for grid points
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, size / 2, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Draw crosshair
+        const crossSize = size * 1.5;
+        ctx.beginPath();
+        ctx.moveTo(point.x - crossSize, point.y);
+        ctx.lineTo(point.x + crossSize, point.y);
+        ctx.moveTo(point.x, point.y - crossSize);
+        ctx.lineTo(point.x, point.y + crossSize);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    drawAlignmentGuides(ctx) {
+        ctx.save();
+        ctx.strokeStyle = '#f59e0b'; // Orange for alignment guides
+        ctx.lineWidth = 1 / this.zoom;
+        ctx.setLineDash([8 / this.zoom, 4 / this.zoom]);
+        ctx.globalAlpha = 0.6;
+
+        this.alignmentGuides.forEach(guide => {
+            ctx.beginPath();
+            if (guide.type === 'horizontal') {
+                // Draw horizontal line across canvas
+                const canvasLeft = (-this.panOffset.x) / this.zoom;
+                const canvasRight = (this.overlayCanvas.width - this.panOffset.x) / this.zoom;
+                ctx.moveTo(canvasLeft, guide.y);
+                ctx.lineTo(canvasRight, guide.y);
+            } else if (guide.type === 'vertical') {
+                // Draw vertical line across canvas
+                const canvasTop = (-this.panOffset.y) / this.zoom;
+                const canvasBottom = (this.overlayCanvas.height - this.panOffset.y) / this.zoom;
+                ctx.moveTo(guide.x, canvasTop);
+                ctx.lineTo(guide.x, canvasBottom);
+            }
+            ctx.stroke();
+        });
 
         ctx.restore();
     }
@@ -723,8 +808,131 @@ class BlueprintManager {
     }
 
     snapPoint(point) {
-        if (!this.snapToGrid) return point;
-        return Utils.geometry.snapToGrid(point, this.scale * this.gridSize);
+        const snapRadius = 20 / this.zoom; // Snap radius in world coordinates
+
+        // Priority 1: Snap to wall endpoints (magnetic snapping)
+        const endpoint = this.findNearestEndpoint(point, snapRadius);
+        if (endpoint) {
+            this.snapPoint = { ...endpoint, type: 'endpoint' };
+            return endpoint;
+        }
+
+        // Priority 2: Snap to wall midpoints
+        const midpoint = this.findNearestMidpoint(point, snapRadius);
+        if (midpoint) {
+            this.snapPoint = { ...midpoint, type: 'midpoint' };
+            return midpoint;
+        }
+
+        // Priority 3: Snap to grid
+        if (this.snapToGrid) {
+            const gridPoint = Utils.geometry.snapToGrid(point, this.scale * this.gridSize);
+            this.snapPoint = { ...gridPoint, type: 'grid' };
+            return gridPoint;
+        }
+
+        this.snapPoint = null;
+        return point;
+    }
+
+    findNearestEndpoint(point, radius) {
+        let nearest = null;
+        let minDist = radius;
+
+        // Check all wall endpoints
+        this.walls.forEach(wall => {
+            [wall.start, wall.end].forEach(ep => {
+                const dist = Utils.geometry.distance(point, ep);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = { x: ep.x, y: ep.y };
+                }
+            });
+        });
+
+        // Check door and window endpoints too
+        [...this.doors, ...this.windows].forEach(elem => {
+            [elem.start, elem.end].forEach(ep => {
+                const dist = Utils.geometry.distance(point, ep);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = { x: ep.x, y: ep.y };
+                }
+            });
+        });
+
+        return nearest;
+    }
+
+    findNearestMidpoint(point, radius) {
+        let nearest = null;
+        let minDist = radius;
+
+        this.walls.forEach(wall => {
+            const mid = Utils.geometry.midpoint(wall.start, wall.end);
+            const dist = Utils.geometry.distance(point, mid);
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = mid;
+            }
+        });
+
+        return nearest;
+    }
+
+    applyOrthogonalConstraint(start, end) {
+        if (!this.orthogonalMode && !this.isDrawing) return end;
+
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+
+        // Snap to nearest 45° angle, but prefer horizontal/vertical
+        if (Math.abs(dx) > Math.abs(dy) * 2) {
+            // Horizontal
+            return { x: end.x, y: start.y };
+        } else if (Math.abs(dy) > Math.abs(dx) * 2) {
+            // Vertical
+            return { x: start.x, y: end.y };
+        } else if (this.orthogonalMode) {
+            // 45° diagonal when shift is held
+            const avgDist = (Math.abs(dx) + Math.abs(dy)) / 2;
+            return {
+                x: start.x + (dx > 0 ? avgDist : -avgDist),
+                y: start.y + (dy > 0 ? avgDist : -avgDist)
+            };
+        }
+
+        return end;
+    }
+
+    findAlignmentGuides(point) {
+        const guides = [];
+        const threshold = 5 / this.zoom;
+
+        // Find horizontal and vertical alignments with existing elements
+        this.walls.forEach(wall => {
+            [wall.start, wall.end].forEach(ep => {
+                // Horizontal alignment
+                if (Math.abs(point.y - ep.y) < threshold) {
+                    guides.push({
+                        type: 'horizontal',
+                        y: ep.y,
+                        point: ep
+                    });
+                }
+                // Vertical alignment
+                if (Math.abs(point.x - ep.x) < threshold) {
+                    guides.push({
+                        type: 'vertical',
+                        x: ep.x,
+                        point: ep
+                    });
+                }
+            });
+        });
+
+        this.alignmentGuides = guides;
+        return guides;
     }
 
     getMousePosition(event) {
@@ -842,6 +1050,9 @@ class BlueprintManager {
     handleMouseMove(event) {
         const point = this.getMousePosition(event);
 
+        // Update orthogonal mode based on shift key
+        this.orthogonalMode = event.shiftKey;
+
         if (this.isPanning) {
             const dx = event.clientX - this.lastPanPoint.x;
             const dy = event.clientY - this.lastPanPoint.y;
@@ -855,16 +1066,36 @@ class BlueprintManager {
         }
 
         if (this.isDrawing) {
-            this.currentPoint = this.snapPoint(point);
+            let snapped = this.snapPoint(point);
+
+            // Apply orthogonal constraint if drawing walls
+            if (this.currentTool.startsWith('wall') && this.startPoint) {
+                snapped = this.applyOrthogonalConstraint(this.startPoint, snapped);
+            }
+
+            this.currentPoint = snapped;
+
+            // Find alignment guides
+            this.findAlignmentGuides(snapped);
+
             this.draw();
         } else {
+            // Show snap indicators even when not drawing
+            this.snapPoint(point);
+            this.findAlignmentGuides(point);
+
             // Update hover state
             const found = this.findElementAtPoint(point);
             if (found && found.element !== this.hoveredElement) {
                 this.hoveredElement = found.element;
+                this.blueprintCanvas.style.cursor = 'pointer';
                 this.draw();
             } else if (!found && this.hoveredElement) {
                 this.hoveredElement = null;
+                this.blueprintCanvas.style.cursor = 'crosshair';
+                this.draw();
+            } else if (this.snapPoint || this.alignmentGuides.length > 0) {
+                // Redraw to show snap indicators
                 this.draw();
             }
         }
