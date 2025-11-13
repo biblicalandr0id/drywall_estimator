@@ -1145,3 +1145,69 @@ select[title]:hover::before {
     font-family: 'Courier New', monospace;
     font-weight: 600;
 }
+
+/* ==================== CONTEXT MENU ==================== */
+.context-menu {
+    position: fixed;
+    display: none;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-xs);
+    min-width: 200px;
+    z-index: 10000;
+    border: 1px solid var(--border-color);
+}
+
+.context-menu.active {
+    display: block;
+    animation: contextMenuFadeIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes contextMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-md);
+}
+
+.context-menu-item:hover {
+    background: var(--bg-hover);
+    color: var(--color-primary);
+}
+
+.context-menu-icon {
+    font-size: 16px;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.context-menu-shortcut {
+    margin-left: auto;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    font-family: 'Courier New', monospace;
+}
+
+.context-menu-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: var(--space-xs) 0;
+}

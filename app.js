@@ -983,7 +983,7 @@ class DrywallEstimatorApp {
                 this.blueprint.zoomFit();
             }
 
-            // Undo/Redo
+            // Undo/Redo and Clipboard
             if (e.ctrlKey || e.metaKey) {
                 if (e.key === 'z') {
                     e.preventDefault();
@@ -994,6 +994,15 @@ class DrywallEstimatorApp {
                 } else if (e.key === 's') {
                     e.preventDefault();
                     this.saveProject();
+                } else if (e.key === 'c') {
+                    e.preventDefault();
+                    this.blueprint.copySelected();
+                } else if (e.key === 'v') {
+                    e.preventDefault();
+                    this.blueprint.pasteClipboard();
+                } else if (e.key === 'd') {
+                    e.preventDefault();
+                    this.blueprint.duplicateSelected();
                 }
             }
 

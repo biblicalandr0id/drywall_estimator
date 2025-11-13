@@ -32,6 +32,9 @@ class BlueprintManager {
         this.nearbyEndpoints = []; // Nearby wall endpoints for snapping
         this.alignmentGuides = []; // Smart alignment guides
         this.orthogonalMode = false; // Shift key for orthogonal drawing
+        this.isSelectingRectangle = false; // Selection rectangle mode
+        this.selectionStart = null; // Selection rectangle start
+        this.clipboard = null; // Copied elements
 
         // Data
         this.walls = [];
@@ -110,7 +113,7 @@ class BlueprintManager {
         this.blueprintCanvas.addEventListener('dblclick', this.handleDoubleClick.bind(this));
 
         // Context menu
-        this.blueprintCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        this.blueprintCanvas.addEventListener('contextmenu', this.handleContextMenu.bind(this));
 
         // Window resize
         window.addEventListener('resize', Utils.debounce(() => this.resize(), 250));
@@ -1160,6 +1163,174 @@ class BlueprintManager {
         if (found && found.type === 'wall') {
             // Show add door/window context menu
             this.showWallContextMenu(found, event.clientX, event.clientY);
+        }
+    }
+
+    handleContextMenu(event) {
+        event.preventDefault();
+
+        const point = this.getMousePosition(event);
+        const found = this.findElementAtPoint(point);
+
+        if (found) {
+            // Select the element if not already selected
+            if (!this.selectedElements.includes(found.element)) {
+                this.selectedElements = [found.element];
+                this.draw();
+            }
+
+            // Show context menu
+            this.showContextMenu(event.clientX, event.clientY);
+        } else {
+            this.hideContextMenu();
+        }
+    }
+
+    showContextMenu(x, y) {
+        const menu = document.getElementById('context-menu');
+        if (!menu) return;
+
+        // Position menu
+        menu.style.left = `${x}px`;
+        menu.style.top = `${y}px`;
+        menu.classList.add('active');
+
+        // Setup menu item handlers
+        const items = menu.querySelectorAll('.context-menu-item');
+        items.forEach(item => {
+            item.onclick = (e) => {
+                const action = item.dataset.action;
+                this.handleContextMenuAction(action);
+                this.hideContextMenu();
+            };
+        });
+
+        // Close menu on click outside
+        const closeHandler = (e) => {
+            if (!menu.contains(e.target)) {
+                this.hideContextMenu();
+                document.removeEventListener('click', closeHandler);
+            }
+        };
+        setTimeout(() => document.addEventListener('click', closeHandler), 100);
+    }
+
+    hideContextMenu() {
+        const menu = document.getElementById('context-menu');
+        if (menu) {
+            menu.classList.remove('active');
+        }
+    }
+
+    handleContextMenuAction(action) {
+        switch (action) {
+            case 'copy':
+                this.copySelected();
+                break;
+            case 'duplicate':
+                this.duplicateSelected();
+                break;
+            case 'delete':
+                this.deleteSelected();
+                break;
+            case 'properties':
+                this.showPropertiesPanel();
+                break;
+        }
+    }
+
+    copySelected() {
+        if (this.selectedElements.length > 0) {
+            this.clipboard = Utils.object.clone(this.selectedElements);
+            this.setStatus(`Copied ${this.clipboard.length} element(s)`);
+        }
+    }
+
+    pasteClipboard() {
+        if (!this.clipboard || this.clipboard.length === 0) return;
+
+        // Offset pasted elements
+        const offset = 20;
+        this.clipboard.forEach(elem => {
+            const newElem = Utils.object.clone(elem);
+
+            if (newElem.start && newElem.end) {
+                newElem.start.x += offset;
+                newElem.start.y += offset;
+                newElem.end.x += offset;
+                newElem.end.y += offset;
+            } else if (newElem.points) {
+                newElem.points = newElem.points.map(p => ({
+                    x: p.x + offset,
+                    y: p.y + offset
+                }));
+            }
+
+            // Add to appropriate array based on type
+            if (newElem.type && newElem.type.startsWith('wall')) {
+                this.walls.push(newElem);
+            } else if (newElem.type && newElem.type.startsWith('door')) {
+                this.doors.push(newElem);
+            } else if (newElem.type && newElem.type.startsWith('window')) {
+                this.windows.push(newElem);
+            }
+        });
+
+        this.saveToHistory('paste elements');
+        this.draw();
+        this.setStatus(`Pasted ${this.clipboard.length} element(s)`);
+    }
+
+    duplicateSelected() {
+        if (this.selectedElements.length > 0) {
+            this.copySelected();
+            this.pasteClipboard();
+        }
+    }
+
+    deleteSelected() {
+        this.selectedElements.forEach(elem => {
+            // Find and remove from appropriate array
+            let index = this.walls.indexOf(elem);
+            if (index !== -1) {
+                this.walls.splice(index, 1);
+            }
+
+            index = this.doors.indexOf(elem);
+            if (index !== -1) {
+                this.doors.splice(index, 1);
+            }
+
+            index = this.windows.indexOf(elem);
+            if (index !== -1) {
+                this.windows.splice(index, 1);
+            }
+
+            index = this.stairs.indexOf(elem);
+            if (index !== -1) {
+                this.stairs.splice(index, 1);
+            }
+
+            index = this.rooms.indexOf(elem);
+            if (index !== -1) {
+                this.rooms.splice(index, 1);
+            }
+        });
+
+        this.selectedElements = [];
+        this.saveToHistory('delete elements');
+        this.draw();
+    }
+
+    showPropertiesPanel() {
+        // Placeholder for properties panel
+        console.log('Properties panel would show here for:', this.selectedElements);
+    }
+
+    setStatus(message) {
+        const statusEl = document.getElementById('status-message');
+        if (statusEl) {
+            statusEl.textContent = message;
         }
     }
 
