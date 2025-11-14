@@ -570,6 +570,21 @@
 
         <!-- Canvas Area (Full Screen) -->
         <main class="canvas-main">
+            <!-- Tool Status Bar -->
+            <div class="tool-status-bar" id="tool-status-bar">
+                <div class="tool-status-info">
+                    <span class="tool-status-icon" id="tool-status-icon">↖</span>
+                    <span class="tool-status-name" id="tool-status-name">Select Tool</span>
+                </div>
+                <div class="tool-status-instructions" id="tool-status-instructions">
+                    Click to select elements • Drag to move • Shift+Click for multi-select
+                </div>
+                <div class="tool-status-hints">
+                    <span class="tool-hint">⇧ Shift: Orthogonal</span>
+                    <span class="tool-hint">⌃ Ctrl: Snap Off</span>
+                </div>
+            </div>
+
             <div id="blueprint-container" class="blueprint-container">
                 <canvas id="grid-canvas"></canvas>
                 <canvas id="blueprint-canvas"></canvas>
@@ -811,6 +826,31 @@
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-spinner"></div>
         <p>Loading...</p>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu">
+        <div class="context-menu-item" data-action="copy">
+            <span class="context-menu-icon">📋</span>
+            <span>Copy</span>
+            <span class="context-menu-shortcut">Ctrl+C</span>
+        </div>
+        <div class="context-menu-item" data-action="duplicate">
+            <span class="context-menu-icon">⊕</span>
+            <span>Duplicate</span>
+            <span class="context-menu-shortcut">Ctrl+D</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="delete">
+            <span class="context-menu-icon">🗑️</span>
+            <span>Delete</span>
+            <span class="context-menu-shortcut">Del</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" data-action="properties">
+            <span class="context-menu-icon">⚙️</span>
+            <span>Properties</span>
+        </div>
     </div>
 
     <script src="utils.js"></script>

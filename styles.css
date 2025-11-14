@@ -1086,3 +1086,128 @@ select[title]:hover::before {
 .text-warning {
     color: var(--color-warning);
 }
+
+/* ==================== TOOL STATUS BAR ==================== */
+.tool-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+    min-height: 48px;
+}
+
+.tool-status-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tool-status-icon {
+    font-size: 22px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-active) 100%);
+    color: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.tool-status-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.tool-status-instructions {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.tool-status-hints {
+    display: flex;
+    gap: 12px;
+}
+
+.tool-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 4px 12px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+/* ==================== CONTEXT MENU ==================== */
+.context-menu {
+    position: fixed;
+    display: none;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-xs);
+    min-width: 200px;
+    z-index: 10000;
+    border: 1px solid var(--border-color);
+}
+
+.context-menu.active {
+    display: block;
+    animation: contextMenuFadeIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes contextMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-md);
+}
+
+.context-menu-item:hover {
+    background: var(--bg-hover);
+    color: var(--color-primary);
+}
+
+.context-menu-icon {
+    font-size: 16px;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.context-menu-shortcut {
+    margin-left: auto;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    font-family: 'Courier New', monospace;
+}
+
+.context-menu-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: var(--space-xs) 0;
+}
