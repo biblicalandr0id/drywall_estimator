@@ -24,6 +24,7 @@ class BlueprintManager {
         this.currentTool = 'select';
         this.isDrawing = false;
         this.isPanning = false;
+        this.spacebarPanning = false; // Spacebar temporary pan mode
         this.startPoint = null;
         this.currentPoint = null;
         this.selectedElements = [];
@@ -38,6 +39,15 @@ class BlueprintManager {
         this.isDragging = false; // Element dragging mode
         this.dragStart = null; // Drag start position
         this.dragOffset = { x: 0, y: 0 }; // Current drag offset
+        this.isRotating = false; // Rotation mode
+        this.rotationCenter = null; // Center of rotation
+        this.rotationAngle = 0; // Current rotation angle
+        this.groupedElements = []; // Groups of elements
+        this.lockedElements = []; // Locked elements
+        this.units = 'feet'; // Current units: 'feet', 'inches', 'meters'
+        this.showRulers = true; // Show edge rulers
+        this.showMinimap = true; // Show minimap navigator
+        this.currentAngle = null; // Current drawing angle
 
         // Data
         this.walls = [];
@@ -117,6 +127,10 @@ class BlueprintManager {
 
         // Context menu
         this.blueprintCanvas.addEventListener('contextmenu', this.handleContextMenu.bind(this));
+
+        // Keyboard events for advanced features
+        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+        document.addEventListener('keyup', this.handleKeyUp.bind(this));
 
         // Window resize
         window.addEventListener('resize', Utils.debounce(() => this.resize(), 250));
@@ -225,6 +239,10 @@ class BlueprintManager {
                 this.drawDraggedElement(ctx, elem, this.dragOffset);
             } else {
                 this.drawElementHighlight(ctx, elem, this.colors.selected);
+                // Draw rotation handles if element is selected
+                if (this.selectedElements.length === 1) {
+                    this.drawRotationHandles(ctx, elem);
+                }
             }
         });
 
@@ -243,12 +261,23 @@ class BlueprintManager {
             this.drawSnapIndicator(ctx, this.snapPoint);
         }
 
-        // Draw current drawing
+        // Draw current drawing with angle display
         if (this.isDrawing && this.startPoint && this.currentPoint) {
             this.drawCurrentDrawing(ctx);
+            this.drawAngleIndicator(ctx);
         }
 
         ctx.restore();
+
+        // Draw rulers (in screen space)
+        if (this.showRulers) {
+            this.drawRulers(ctx);
+        }
+
+        // Draw minimap (in screen space)
+        if (this.showMinimap) {
+            this.drawMinimap(ctx);
+        }
     }
 
     drawSelectionRectangle(ctx) {
@@ -391,6 +420,275 @@ class BlueprintManager {
         });
 
         ctx.restore();
+    }
+
+    drawRotationHandles(ctx, element) {
+        if (!element.start || !element.end) return;
+
+        const mid = Utils.geometry.midpoint(element.start, element.end);
+        const angle = Utils.geometry.angle(element.start, element.end);
+        const length = Utils.geometry.distance(element.start, element.end);
+        const handleDist = 40 / this.zoom;
+
+        // Draw rotation handle above center
+        const handlePos = {
+            x: mid.x + Math.cos(angle + Math.PI / 2) * handleDist,
+            y: mid.y + Math.sin(angle + Math.PI / 2) * handleDist
+        };
+
+        ctx.save();
+        ctx.strokeStyle = '#2563eb';
+        ctx.fillStyle = '#ffffff';
+        ctx.lineWidth = 2 / this.zoom;
+
+        // Draw connection line
+        ctx.beginPath();
+        ctx.moveTo(mid.x, mid.y);
+        ctx.lineTo(handlePos.x, handlePos.y);
+        ctx.stroke();
+
+        // Draw rotation handle circle
+        ctx.beginPath();
+        ctx.arc(handlePos.x, handlePos.y, 8 / this.zoom, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw rotation icon
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 1.5 / this.zoom;
+        const iconRadius = 5 / this.zoom;
+        ctx.beginPath();
+        ctx.arc(handlePos.x, handlePos.y, iconRadius, 0.2, Math.PI * 1.8);
+        ctx.stroke();
+
+        // Draw arrow
+        const arrowAngle = Math.PI * 1.8;
+        const arrowSize = 3 / this.zoom;
+        ctx.beginPath();
+        ctx.moveTo(
+            handlePos.x + Math.cos(arrowAngle) * iconRadius,
+            handlePos.y + Math.sin(arrowAngle) * iconRadius
+        );
+        ctx.lineTo(
+            handlePos.x + Math.cos(arrowAngle - 0.3) * (iconRadius + arrowSize),
+            handlePos.y + Math.sin(arrowAngle - 0.3) * (iconRadius + arrowSize)
+        );
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    drawAngleIndicator(ctx) {
+        if (!this.startPoint || !this.currentPoint) return;
+
+        const angle = Utils.geometry.angle(this.startPoint, this.currentPoint);
+        const degrees = (angle * 180 / Math.PI + 360) % 360;
+        const mid = Utils.geometry.midpoint(this.startPoint, this.currentPoint);
+
+        ctx.save();
+        ctx.fillStyle = '#2563eb';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2 / this.zoom;
+        ctx.font = `bold ${12 / this.zoom}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const text = `${degrees.toFixed(1)}°`;
+        const padding = 6 / this.zoom;
+        const metrics = ctx.measureText(text);
+        const badgeWidth = metrics.width + padding * 2;
+        const badgeHeight = 20 / this.zoom;
+
+        // Draw badge
+        const offset = 30 / this.zoom;
+        const badgeX = mid.x;
+        const badgeY = mid.y - offset;
+
+        this.roundRect(ctx,
+            badgeX - badgeWidth / 2,
+            badgeY - badgeHeight / 2,
+            badgeWidth,
+            badgeHeight,
+            3 / this.zoom
+        );
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw text
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(text, badgeX, badgeY);
+
+        ctx.restore();
+    }
+
+    drawRulers(ctx) {
+        const rulerSize = 30;
+        const rulerColor = '#f3f4f6';
+        const textColor = '#6b7280';
+        const tickColor = '#9ca3af';
+
+        ctx.save();
+        ctx.font = '10px -apple-system, system-ui, sans-serif';
+
+        // Horizontal ruler
+        ctx.fillStyle = rulerColor;
+        ctx.fillRect(0, 0, this.overlayCanvas.width, rulerSize);
+
+        // Vertical ruler
+        ctx.fillRect(0, 0, rulerSize, this.overlayCanvas.height);
+
+        // Corner box
+        ctx.fillStyle = '#e5e7eb';
+        ctx.fillRect(0, 0, rulerSize, rulerSize);
+
+        // Draw horizontal ticks and labels
+        ctx.strokeStyle = tickColor;
+        ctx.fillStyle = textColor;
+        ctx.lineWidth = 1;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+
+        const gridSpacing = this.scale * this.zoom;
+        const startX = this.panOffset.x % gridSpacing;
+
+        for (let x = startX; x < this.overlayCanvas.width; x += gridSpacing) {
+            const worldX = (x - this.panOffset.x) / this.zoom / this.scale;
+
+            // Major tick every 5 units
+            if (Math.abs(worldX % 5) < 0.1) {
+                ctx.beginPath();
+                ctx.moveTo(x, rulerSize - 15);
+                ctx.lineTo(x, rulerSize);
+                ctx.stroke();
+
+                ctx.fillText(this.formatDistance(Math.round(worldX)), x, rulerSize - 18);
+            } else {
+                // Minor tick
+                ctx.beginPath();
+                ctx.moveTo(x, rulerSize - 8);
+                ctx.lineTo(x, rulerSize);
+                ctx.stroke();
+            }
+        }
+
+        // Draw vertical ticks and labels
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+
+        const startY = this.panOffset.y % gridSpacing;
+
+        for (let y = startY; y < this.overlayCanvas.height; y += gridSpacing) {
+            const worldY = (y - this.panOffset.y) / this.zoom / this.scale;
+
+            // Major tick every 5 units
+            if (Math.abs(worldY % 5) < 0.1) {
+                ctx.beginPath();
+                ctx.moveTo(rulerSize - 15, y);
+                ctx.lineTo(rulerSize, y);
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(rulerSize - 18, y);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillText(this.formatDistance(Math.round(worldY)), 0, 0);
+                ctx.restore();
+            } else {
+                // Minor tick
+                ctx.beginPath();
+                ctx.moveTo(rulerSize - 8, y);
+                ctx.lineTo(rulerSize, y);
+                ctx.stroke();
+            }
+        }
+
+        ctx.restore();
+    }
+
+    drawMinimap(ctx) {
+        const minimapSize = 150;
+        const minimapPadding = 10;
+        const minimapX = this.overlayCanvas.width - minimapSize - minimapPadding;
+        const minimapY = minimapPadding;
+
+        // Get all elements bounds
+        const allPoints = [
+            ...this.walls.flatMap(w => [w.start, w.end]),
+            ...this.doors.flatMap(d => [d.start, d.end]),
+            ...this.windows.flatMap(w => [w.start, w.end])
+        ];
+
+        if (allPoints.length === 0) return;
+
+        const bbox = Utils.geometry.getBoundingBox(allPoints);
+        const bboxWidth = bbox.maxX - bbox.minX;
+        const bboxHeight = bbox.maxY - bbox.minY;
+
+        if (bboxWidth === 0 || bboxHeight === 0) return;
+
+        // Calculate minimap scale
+        const scale = Math.min(
+            (minimapSize - 20) / bboxWidth,
+            (minimapSize - 20) / bboxHeight
+        );
+
+        ctx.save();
+
+        // Draw minimap background
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 2;
+        this.roundRect(ctx, minimapX, minimapY, minimapSize, minimapSize, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        // Clip to minimap
+        ctx.beginPath();
+        ctx.rect(minimapX + 2, minimapY + 2, minimapSize - 4, minimapSize - 4);
+        ctx.clip();
+
+        // Translate to minimap center
+        const minimapCenterX = minimapX + minimapSize / 2;
+        const minimapCenterY = minimapY + minimapSize / 2;
+        const bboxCenterX = (bbox.minX + bbox.maxX) / 2;
+        const bboxCenterY = (bbox.minY + bbox.maxY) / 2;
+
+        ctx.translate(minimapCenterX, minimapCenterY);
+        ctx.scale(scale, scale);
+        ctx.translate(-bboxCenterX, -bboxCenterY);
+
+        // Draw all walls
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 2 / scale;
+        this.walls.forEach(wall => {
+            ctx.beginPath();
+            ctx.moveTo(wall.start.x, wall.start.y);
+            ctx.lineTo(wall.end.x, wall.end.y);
+            ctx.stroke();
+        });
+
+        // Draw viewport indicator
+        const viewLeft = (-this.panOffset.x) / this.zoom;
+        const viewTop = (-this.panOffset.y) / this.zoom;
+        const viewRight = (this.overlayCanvas.width - this.panOffset.x) / this.zoom;
+        const viewBottom = (this.overlayCanvas.height - this.panOffset.y) / this.zoom;
+
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 2 / scale;
+        ctx.strokeRect(viewLeft, viewTop, viewRight - viewLeft, viewBottom - viewTop);
+
+        ctx.restore();
+    }
+
+    formatDistance(value) {
+        switch (this.units) {
+            case 'inches':
+                return `${(value * 12).toFixed(0)}"`;
+            case 'meters':
+                return `${(value * 0.3048).toFixed(2)}m`;
+            case 'feet':
+            default:
+                return `${value}'`;
+        }
     }
 
     drawRooms(ctx) {
@@ -1161,8 +1459,8 @@ class BlueprintManager {
     handleMouseDown(event) {
         const point = this.getMousePosition(event);
 
-        // Pan with middle mouse or Ctrl+Left
-        if (event.button === 1 || (event.button === 0 && event.ctrlKey)) {
+        // Pan with spacebar, middle mouse, or Ctrl+Left
+        if (this.spacebarPanning || event.button === 1 || (event.button === 0 && event.ctrlKey)) {
             this.isPanning = true;
             this.lastPanPoint = { x: event.clientX, y: event.clientY };
             this.blueprintCanvas.style.cursor = 'grabbing';
@@ -1845,6 +2143,418 @@ class BlueprintManager {
     showWallContextMenu(wallInfo, x, y) {
         // This would trigger a context menu - implement based on your UI framework
         console.log('Context menu for wall at', x, y);
+    }
+
+    // ==================== KEYBOARD HANDLERS ====================
+
+    handleKeyDown(e) {
+        // Spacebar for temporary pan mode
+        if (e.code === 'Space' && !this.spacebarPanning && !this.isDrawing) {
+            e.preventDefault();
+            this.spacebarPanning = true;
+            this.blueprintCanvas.style.cursor = 'grab';
+            return;
+        }
+
+        // ESC to deselect
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            this.selectedElements = [];
+            this.isDrawing = false;
+            this.isDragging = false;
+            this.isSelectingRectangle = false;
+            this.startPoint = null;
+            this.currentPoint = null;
+            this.draw();
+            return;
+        }
+
+        // Ctrl/Cmd + A to select all
+        if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+            e.preventDefault();
+            this.selectAll();
+            return;
+        }
+
+        // Ctrl/Cmd + G to group
+        if ((e.ctrlKey || e.metaKey) && e.key === 'g' && !e.shiftKey) {
+            e.preventDefault();
+            this.groupSelected();
+            return;
+        }
+
+        // Ctrl/Cmd + Shift + G to ungroup
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'G') {
+            e.preventDefault();
+            this.ungroupSelected();
+            return;
+        }
+
+        // Ctrl/Cmd + L to lock
+        if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+            e.preventDefault();
+            this.lockSelected();
+            return;
+        }
+
+        // Ctrl/Cmd + Shift + L to unlock
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'L') {
+            e.preventDefault();
+            this.unlockSelected();
+            return;
+        }
+
+        // Ctrl/Cmd + Shift + F to zoom to selection
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
+            e.preventDefault();
+            this.zoomToSelection();
+            return;
+        }
+
+        // Align tools
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    this.alignSelected('left');
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    this.alignSelected('right');
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    this.alignSelected('top');
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    this.alignSelected('bottom');
+                    break;
+                case 'H':
+                    e.preventDefault();
+                    this.alignSelected('center-horizontal');
+                    break;
+                case 'V':
+                    e.preventDefault();
+                    this.alignSelected('center-vertical');
+                    break;
+            }
+            return;
+        }
+
+        // Arrow key nudging (move selected elements)
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+            if (this.selectedElements.length > 0) {
+                e.preventDefault();
+                const nudgeAmount = e.shiftKey ? 10 : 1; // 10 pixels with shift, 1 without
+                const dx = e.key === 'ArrowLeft' ? -nudgeAmount / this.zoom :
+                          e.key === 'ArrowRight' ? nudgeAmount / this.zoom : 0;
+                const dy = e.key === 'ArrowUp' ? -nudgeAmount / this.zoom :
+                          e.key === 'ArrowDown' ? nudgeAmount / this.zoom : 0;
+
+                this.nudgeSelected(dx, dy);
+                return;
+            }
+        }
+    }
+
+    handleKeyUp(e) {
+        // Release spacebar panning
+        if (e.code === 'Space' && this.spacebarPanning) {
+            e.preventDefault();
+            this.spacebarPanning = false;
+            this.blueprintCanvas.style.cursor = this.currentTool === 'select' ? 'default' : 'crosshair';
+        }
+    }
+
+    // ==================== ADVANCED SELECTION & MANIPULATION ====================
+
+    selectAll() {
+        this.selectedElements = [
+            ...this.walls,
+            ...this.doors,
+            ...this.windows,
+            ...this.stairs,
+            ...this.rooms
+        ];
+        this.draw();
+        this.setStatus(`Selected ${this.selectedElements.length} elements`);
+    }
+
+    nudgeSelected(dx, dy) {
+        this.selectedElements.forEach(elem => {
+            if (this.isElementLocked(elem)) return;
+
+            if (elem.start && elem.end) {
+                elem.start.x += dx;
+                elem.start.y += dy;
+                elem.end.x += dx;
+                elem.end.y += dy;
+            } else if (elem.points) {
+                elem.points.forEach(p => {
+                    p.x += dx;
+                    p.y += dy;
+                });
+            }
+        });
+
+        this.saveToHistory('nudge elements');
+        this.draw();
+    }
+
+    alignSelected(alignment) {
+        if (this.selectedElements.length < 2) {
+            this.setStatus('Select at least 2 elements to align');
+            return;
+        }
+
+        // Get bounds of all selected elements
+        const bounds = this.getSelectionBounds();
+        if (!bounds) return;
+
+        this.selectedElements.forEach(elem => {
+            if (this.isElementLocked(elem)) return;
+
+            const elemBounds = this.getElementBounds(elem);
+            if (!elemBounds) return;
+
+            let dx = 0, dy = 0;
+
+            switch (alignment) {
+                case 'left':
+                    dx = bounds.minX - elemBounds.minX;
+                    break;
+                case 'right':
+                    dx = bounds.maxX - elemBounds.maxX;
+                    break;
+                case 'top':
+                    dy = bounds.minY - elemBounds.minY;
+                    break;
+                case 'bottom':
+                    dy = bounds.maxY - elemBounds.maxY;
+                    break;
+                case 'center-horizontal':
+                    const boundsCenter = (bounds.minX + bounds.maxX) / 2;
+                    const elemCenter = (elemBounds.minX + elemBounds.maxX) / 2;
+                    dx = boundsCenter - elemCenter;
+                    break;
+                case 'center-vertical':
+                    const boundsCenterY = (bounds.minY + bounds.maxY) / 2;
+                    const elemCenterY = (elemBounds.minY + elemBounds.maxY) / 2;
+                    dy = boundsCenterY - elemCenterY;
+                    break;
+            }
+
+            if (elem.start && elem.end) {
+                elem.start.x += dx;
+                elem.start.y += dy;
+                elem.end.x += dx;
+                elem.end.y += dy;
+            } else if (elem.points) {
+                elem.points.forEach(p => {
+                    p.x += dx;
+                    p.y += dy;
+                });
+            }
+        });
+
+        this.saveToHistory(`align ${alignment}`);
+        this.draw();
+        this.setStatus(`Aligned ${this.selectedElements.length} elements to ${alignment}`);
+    }
+
+    getSelectionBounds() {
+        const points = [];
+        this.selectedElements.forEach(elem => {
+            if (elem.start && elem.end) {
+                points.push(elem.start, elem.end);
+            } else if (elem.points) {
+                points.push(...elem.points);
+            }
+        });
+
+        if (points.length === 0) return null;
+        return Utils.geometry.getBoundingBox(points);
+    }
+
+    getElementBounds(elem) {
+        const points = [];
+        if (elem.start && elem.end) {
+            points.push(elem.start, elem.end);
+        } else if (elem.points) {
+            points.push(...elem.points);
+        }
+
+        if (points.length === 0) return null;
+        return Utils.geometry.getBoundingBox(points);
+    }
+
+    groupSelected() {
+        if (this.selectedElements.length < 2) {
+            this.setStatus('Select at least 2 elements to group');
+            return;
+        }
+
+        const group = {
+            id: Utils.generateId('group'),
+            elements: [...this.selectedElements]
+        };
+
+        this.groupedElements.push(group);
+        this.setStatus(`Grouped ${this.selectedElements.length} elements`);
+    }
+
+    ungroupSelected() {
+        // Find groups containing any of the selected elements
+        this.groupedElements = this.groupedElements.filter(group => {
+            const hasSelected = group.elements.some(elem =>
+                this.selectedElements.includes(elem)
+            );
+            return !hasSelected;
+        });
+
+        this.setStatus('Ungrouped selected elements');
+    }
+
+    lockSelected() {
+        this.selectedElements.forEach(elem => {
+            if (!this.lockedElements.includes(elem)) {
+                this.lockedElements.push(elem);
+            }
+        });
+        this.setStatus(`Locked ${this.selectedElements.length} element(s)`);
+        this.draw();
+    }
+
+    unlockSelected() {
+        this.selectedElements.forEach(elem => {
+            const index = this.lockedElements.indexOf(elem);
+            if (index !== -1) {
+                this.lockedElements.splice(index, 1);
+            }
+        });
+        this.setStatus(`Unlocked ${this.selectedElements.length} element(s)`);
+        this.draw();
+    }
+
+    isElementLocked(elem) {
+        return this.lockedElements.includes(elem);
+    }
+
+    zoomToSelection() {
+        if (this.selectedElements.length === 0) {
+            this.setStatus('No elements selected');
+            return;
+        }
+
+        const bounds = this.getSelectionBounds();
+        if (!bounds) return;
+
+        const padding = 50;
+        const width = bounds.maxX - bounds.minX;
+        const height = bounds.maxY - bounds.minY;
+
+        const scaleX = (this.blueprintCanvas.width - padding * 2) / width;
+        const scaleY = (this.blueprintCanvas.height - padding * 2) / height;
+        this.zoom = Math.min(scaleX, scaleY, 5);
+
+        const centerX = (bounds.minX + bounds.maxX) / 2;
+        const centerY = (bounds.minY + bounds.maxY) / 2;
+
+        this.panOffset.x = this.blueprintCanvas.width / 2 - centerX * this.zoom;
+        this.panOffset.y = this.blueprintCanvas.height / 2 - centerY * this.zoom;
+
+        this.updateZoomDisplay();
+        this.draw();
+        this.setStatus('Zoomed to selection');
+    }
+
+    toggleUnits() {
+        const units = ['feet', 'inches', 'meters'];
+        const currentIndex = units.indexOf(this.units);
+        this.units = units[(currentIndex + 1) % units.length];
+        this.draw();
+        this.setStatus(`Units: ${this.units}`);
+    }
+
+    exportToPNG() {
+        // Create a temporary canvas with all layers combined
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = this.blueprintCanvas.width;
+        exportCanvas.height = this.blueprintCanvas.height;
+        const ctx = exportCanvas.getContext('2d');
+
+        // Draw white background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+        // Draw grid canvas
+        ctx.drawImage(this.gridCanvas, 0, 0);
+
+        // Draw blueprint canvas
+        ctx.drawImage(this.blueprintCanvas, 0, 0);
+
+        // Convert to blob and download
+        exportCanvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `blueprint-${Date.now()}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+            this.setStatus('Exported to PNG');
+        });
+    }
+
+    exportToSVG() {
+        // Create SVG string
+        let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${this.blueprintCanvas.width}" height="${this.blueprintCanvas.height}" viewBox="0 0 ${this.blueprintCanvas.width} ${this.blueprintCanvas.height}">`;
+
+        // Add grid
+        if (this.showGrid) {
+            const gridSpacing = this.scale * this.gridSize * this.zoom;
+            svg += `<g id="grid" stroke="#e5e7eb" stroke-width="1">`;
+            for (let x = this.panOffset.x % gridSpacing; x < this.blueprintCanvas.width; x += gridSpacing) {
+                svg += `<line x1="${x}" y1="0" x2="${x}" y2="${this.blueprintCanvas.height}"/>`;
+            }
+            for (let y = this.panOffset.y % gridSpacing; y < this.blueprintCanvas.height; y += gridSpacing) {
+                svg += `<line x1="0" y1="${y}" x2="${this.blueprintCanvas.width}" y2="${y}"/>`;
+            }
+            svg += `</g>`;
+        }
+
+        // Add transformation group
+        svg += `<g transform="translate(${this.panOffset.x},${this.panOffset.y}) scale(${this.zoom})">`;
+
+        // Add walls
+        this.walls.forEach(wall => {
+            const color = this.getWallColor(wall.type);
+            const width = this.getWallWidth(wall.type) / this.zoom;
+            svg += `<line x1="${wall.start.x}" y1="${wall.start.y}" x2="${wall.end.x}" y2="${wall.end.y}" stroke="${color}" stroke-width="${width}" stroke-linecap="butt"/>`;
+        });
+
+        // Add doors
+        this.doors.forEach(door => {
+            const color = door.type === 'door-exterior' ? this.colors.doorExterior : this.colors.doorInterior;
+            svg += `<line x1="${door.start.x}" y1="${door.start.y}" x2="${door.end.x}" y2="${door.end.y}" stroke="${color}" stroke-width="${3 / this.zoom}"/>`;
+        });
+
+        // Add windows
+        this.windows.forEach(window => {
+            svg += `<line x1="${window.start.x}" y1="${window.start.y}" x2="${window.end.x}" y2="${window.end.y}" stroke="${this.colors.window}" stroke-width="${3 / this.zoom}"/>`;
+        });
+
+        svg += `</g></svg>`;
+
+        // Download SVG
+        const blob = new Blob([svg], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `blueprint-${Date.now()}.svg`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.setStatus('Exported to SVG');
     }
 
     // ==================== PUBLIC API ====================

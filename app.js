@@ -52,6 +52,7 @@ class DrywallEstimatorApp {
         this.setupMaterialPricing();
         this.setupCalculation();
         this.setupProjectManagement();
+        this.setupAdvancedFeatures();
         this.setupKeyboardShortcuts();
         this.setupModals();
 
@@ -675,6 +676,82 @@ class DrywallEstimatorApp {
             if (confirm('Are you sure you want to clear all elements on this floor?')) {
                 this.blueprint.clearAll();
             }
+        });
+
+        // Export image
+        document.getElementById('export-image-btn')?.addEventListener('click', () => {
+            this.blueprint.exportToPNG();
+        });
+
+        document.getElementById('export-pdf-btn')?.addEventListener('click', () => {
+            this.blueprint.exportToSVG();
+        });
+    }
+
+    setupAdvancedFeatures() {
+        // Toggle rulers
+        document.getElementById('toggle-rulers')?.addEventListener('change', (e) => {
+            this.blueprint.showRulers = e.target.checked;
+            this.blueprint.draw();
+        });
+
+        // Toggle minimap
+        document.getElementById('toggle-minimap')?.addEventListener('change', (e) => {
+            this.blueprint.showMinimap = e.target.checked;
+            this.blueprint.draw();
+        });
+
+        // Units toggle button
+        document.getElementById('toggle-units-btn')?.addEventListener('click', () => {
+            this.blueprint.toggleUnits();
+        });
+
+        // Align tools
+        document.getElementById('align-left-btn')?.addEventListener('click', () => {
+            this.blueprint.alignSelected('left');
+        });
+
+        document.getElementById('align-center-h-btn')?.addEventListener('click', () => {
+            this.blueprint.alignSelected('center-horizontal');
+        });
+
+        document.getElementById('align-right-btn')?.addEventListener('click', () => {
+            this.blueprint.alignSelected('right');
+        });
+
+        document.getElementById('align-top-btn')?.addEventListener('click', () => {
+            this.blueprint.alignSelected('top');
+        });
+
+        document.getElementById('align-center-v-btn')?.addEventListener('click', () => {
+            this.blueprint.alignSelected('center-vertical');
+        });
+
+        document.getElementById('align-bottom-btn')?.addEventListener('click', () => {
+            this.blueprint.alignSelected('bottom');
+        });
+
+        // Group/Ungroup
+        document.getElementById('group-btn')?.addEventListener('click', () => {
+            this.blueprint.groupSelected();
+        });
+
+        document.getElementById('ungroup-btn')?.addEventListener('click', () => {
+            this.blueprint.ungroupSelected();
+        });
+
+        // Lock/Unlock
+        document.getElementById('lock-btn')?.addEventListener('click', () => {
+            this.blueprint.lockSelected();
+        });
+
+        document.getElementById('unlock-btn')?.addEventListener('click', () => {
+            this.blueprint.unlockSelected();
+        });
+
+        // Zoom to selection
+        document.getElementById('zoom-to-selection-btn')?.addEventListener('click', () => {
+            this.blueprint.zoomToSelection();
         });
     }
 
